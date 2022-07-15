@@ -4,7 +4,7 @@
     <title>Capacitación paquete calidad</title>
     <meta charset="utf-8" />
     <meta name="author" content="" />
-    <meta name="date" content="2022-06-15" />
+    <meta name="date" content="2022-07-15" />
     <link rel="stylesheet" href="xaringan-themer.css" type="text/css" />
   </head>
   <body>
@@ -19,6 +19,8 @@ class: center, middle
 &lt;img src="imagenes/logo_portada2.png" width="200" /&gt;
 
 ## Capacitación en R intermedio
+
+## dplyr y funciones
 
 ## Proyecto Estratégico Servicios Compartidos para la Producción Estadística
 
@@ -38,26 +40,347 @@ background-position: 100% 0%
 
 **Objetivos de la clase**
 
-- "Loops" en dplyr
+- `rowwise`: operaciones por fila
+
+--
+
+- "Loops" en `dplyr`
 
 --
 
 - Repaso de funciones en `R`
 
---
 
-- Funcionales
+Objetivos del taller:
 
---
+- Revisar algunos contenidos de `dplyr` no tan conocidos 
 
-- Programación con dplyr (evaluaciones no estándar)
+- Sentar las bases para los contenidos que vendrán en las próximas sesiones
 
 ---
 
+class: inverse, center, middle
+
+# I. operaciones rowwise 
+
+---
+background-image: url("imagenes/fondo2.PNG")
+background-size: contain;
+background-position: 100% 0%
+
+# rowwise
+
+
+
+
+
+### En `dplyr` estamos acostumbrados a operar de manera vectorizada (verticalmente)
+
+
+```r
+mtcars %&gt;% 
+  group_by(gear) %&gt;% 
+  summarise(media = mean(hp))
+```
+
+```
+## # A tibble: 3 x 2
+##    gear media
+##   &lt;dbl&gt; &lt;dbl&gt;
+## 1     3 176. 
+## 2     4  89.5
+## 3     5 196.
+```
+--
+
+### Queremos una variable que sea la suma de muchas otras
+
+
+
+```r
+mtcars2 &lt;- mtcars %&gt;% 
+  rowwise() %&gt;% 
+  mutate(suma = sum(cyl, disp, hp,drat)) %&gt;% 
+  ungroup()
+```
+
+### rowwise es una herramienta muy útil y un poco subutilizada
+
+---
+background-image: url("imagenes/fondo2.PNG")
+background-size: contain;
+background-position: 100% 0%
+
+# rowwise
+
+### Podemos usar `rowwise` con algunos *helpers*
+
+
+
+
+
+```r
+casen2 &lt;- casen %&gt;% 
+  rowwise() %&gt;% 
+  mutate(suma = sum(c_across(starts_with("yt"))))
+
+
+mtcars2 &lt;- mtcars %&gt;% 
+  rowwise() %&gt;% 
+  mutate(suma = sum(c_across(where(is.numeric))))
+```
+
+---
+background-image: url("imagenes/fondo2.PNG")
+background-size: contain;
+background-position: 100% 0%
+
+# rowwise como "loop"
+
+### Tenemos un dataframe que contiene vectores
+
+
+```r
+df &lt;- tibble(
+  x = list(1, 2:3, 4:6)
+)
+df
+```
+--
+
+### ¿Cuál es el largo de cada vector?
+
+--
+
+
+```r
+df %&gt;% 
+  mutate(largo = length(x))
+```
+
+```
+## # A tibble: 3 x 2
+##   x         largo
+##   &lt;list&gt;    &lt;int&gt;
+## 1 &lt;dbl [1]&gt;     3
+## 2 &lt;int [2]&gt;     3
+## 3 &lt;int [3]&gt;     3
+```
+
+.center[
+
+
+&lt;img src="https://media.giphy.com/media/a5viI92PAF89q/giphy.gif" width="200" /&gt;
+
+
+]
+
+---
+background-image: url("imagenes/fondo2.PNG")
+background-size: contain;
+background-position: 100% 0%
+
+# rowwise como "loop"
+
+### `mutate` no nos es muy útil ¿Otras ideas?
+
+--
+
+
+```r
+df %&gt;% 
+  mutate(largo = map_int(x, length))
+
+df %&gt;% 
+  mutate(largo = sapply(x, length))
+```
+--
+
+### Es deseable no salir del *framework* de `dplyr`
+
+
+```r
+df %&gt;% 
+  rowwise() %&gt;% 
+  mutate(largo = length(x))
+```
+
+```
+## # A tibble: 3 x 2
+## # Rowwise: 
+##   x         largo
+##   &lt;list&gt;    &lt;int&gt;
+## 1 &lt;dbl [1]&gt;     1
+## 2 &lt;int [2]&gt;     2
+## 3 &lt;int [3]&gt;     3
+```
+
+--
+
+### En este caso, `rowwise` opera como un *loop*
+
+
+---
+background-image: url("imagenes/fondo2.PNG")
+background-size: contain;
+background-position: 100% 0%
+
+# Otro ejemplo 
+
+### Queremos simular conjuntos de datos a partir de los siguientes parámetros
+
+
+```r
+df &lt;- tribble(
+  ~ n, ~ min, ~ max,
+    4,     0,     1,
+    2,    10,   100,
+    3,   100,  1000,
+)
+```
+
+--
+
+
+```r
+df2 &lt;- df %&gt;% 
+  mutate(data = runif(n, min, max))
+df2
+```
+
+```
+## # A tibble: 3 x 4
+##       n   min   max    data
+##   &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;   &lt;dbl&gt;
+## 1     4     0     1   0.407
+## 2     2    10   100  71.1  
+## 3     3   100  1000 910.
+```
+---
+background-image: url("imagenes/fondo2.PNG")
+background-size: contain;
+background-position: 100% 0%
+
+# Otro ejemplo (continuación)
+
+### Podemos usar rowwise 
+
+
+```r
+df2 &lt;- df %&gt;% 
+  rowwise() %&gt;% 
+  mutate(data = list(runif(n, min, max)))
+
+df2$data[1]
+```
+
+```
+## [[1]]
+## [1] 0.31760272 0.28945572 0.05888814 0.24164449
+```
+
+--
+
+### `list()` le dice a `mutate` que el resultado de cada operación será un listado de elementos
+
+
+---
+
+background-image: url("imagenes/fondo2.PNG")
+background-size: contain;
+background-position: 100% 0%
+
+# Desventajas de rowwise
+
+### Para tablas con muchas filas, puede volverse un poco lento
+
+
+```r
+tic()
+casen2 &lt;- casen %&gt;% 
+  rowwise() %&gt;% 
+  mutate(suma = sum(yautcorh, ytrabajocor, ymonecorh, yaimcorh, ytotcorh, yoprcor))
+toc()
+```
+
+```
+## 3.36 sec elapsed
+```
+
+--
+
+### Si la eficiencia es algo importante, es recomendable usar funciones como `rowSums` o `rowMeans`
+
+
+```r
+tic()
+casen2 &lt;- casen %&gt;% 
+  mutate(sum = rowSums(select(., yautcorh, ytrabajocor, ymonecorh, yaimcorh, ytotcorh, yoprcor))) 
+toc()
+```
+
+```
+## 0.06 sec elapsed
+```
+--
+
+### El problema es que debemos recurrir a una sintaxis poco elegante
+
+---
+background-image: url("imagenes/fondo2.PNG")
+background-size: contain;
+background-position: 100% 0%
+
+# Ejercicio con rowwise
+
+Tenemos las siguientes fuentes de ingreso a nivel de persona: 
+
+- *y2803c* (jubilación)
+- *ytro* (ingresos ocasionales)
+- *y0101c* (ingreso trabajo dependiente)
+- *y0701c* (ingreso trabajo independiente)
+
+Queremos saber cuál es el mayor de estos valores a nivel de hogar. La idea es usar `rowwise`. 
+
+--
+
+
+```r
+casen2 &lt;- casen %&gt;%
+  rowwise() %&gt;% 
+  mutate(max = max(y2803c, ytro, y0101c, y0701c, na.rm = T)) %&gt;% 
+  group_by(folio) %&gt;% 
+  mutate(maximo = max(max)) %&gt;% 
+  ungroup()
+
+casen2 %&gt;% 
+  select(folio, max, maximo, y2803c, ytro, y0101c, y0701c)
+```
+
+```
+## # A tibble: 185,437 x 7
+##         folio     max  maximo y2803c  ytro  y0101c y0701c
+##         &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt;   &lt;dbl&gt;  &lt;dbl&gt;
+##  1 1101100101  150000  150000      0     0       0 150000
+##  2 1101100101       0  150000      0     0       0      0
+##  3 1101100102       0  372000      0     0       0      0
+##  4 1101100102  372000  372000      0     0  372000      0
+##  5 1101100102       0  372000      0     0       0      0
+##  6 1101100103 3000000 3000000      0     0 3000000      0
+##  7 1101100103       0 3000000      0     0       0      0
+##  8 1101100103       0 3000000      0     0       0      0
+##  9 1101100104       0       0      0     0       0      0
+## 10 1101100104       0       0      0     0       0      0
+## # ... with 185,427 more rows
+```
+
+
+
+---
 
 class: inverse, center, middle
 
-# I. "Loops" en dplyr
+# II. "Loops" en dplyr
 
 
 ---
@@ -72,7 +395,6 @@ background-position: 100% 0%
 $$ norm = \frac{x - min(x)}{max(x) - min(x)}    $$
 
 --
-
 
 
 
@@ -195,6 +517,43 @@ mtcars2 &lt;- mtcars %&gt;%
   mutate_if(is.numeric,  list(norm =  ~(. - min(.)) / (max(.) - min(.)) ))
 ```
 
+---
+background-image: url("imagenes/fondo2.PNG")
+background-size: contain;
+background-position: 100% 0%
+
+# Ejercicio mutate-across
+
+Genere una variable que contenga la suma a nivel de hogar para las siguientes variables de CASEN: *ytotcor*, *yautcor*, *ytrabajocor*, *yotp*.
+
+Las nuevas variables deben tener el sufijo *_hog* 
+
+--
+
+
+```r
+casen2 &lt;- casen %&gt;% 
+  group_by(folio) %&gt;% 
+  mutate(across(c("ytotcor", "yautcor", "ytrabajocor", "yotp"),
+                .fns = list(hog = ~sum(.))  ,
+                .names = "{.col}_{.fn}")) %&gt;% 
+  ungroup()
+
+casen2 %&gt;% 
+  select(folio, ytotcor, ytotcor_hog) %&gt;% 
+  slice(1:4)
+```
+
+```
+## # A tibble: 4 x 3
+##        folio ytotcor ytotcor_hog
+##        &lt;dbl&gt;   &lt;dbl&gt;       &lt;dbl&gt;
+## 1 1101100101  310833      390833
+## 2 1101100101   80000      390833
+## 3 1101100102   31000      947583
+## 4 1101100102  889500      947583
+```
+
 
 
 ---
@@ -275,7 +634,7 @@ mtcars2 &lt;- mtcars %&gt;%
 
 class: inverse, center, middle
 
-# II. Repaso ~~breve~~  de funciones
+# III. Repaso ~~breve~~  de funciones
 
 
 ---
@@ -290,7 +649,7 @@ Las funciones tienen 3 componentes:
 
 - `body`
 - `formals` (argumentos)
-- `enviroment`
+- `environment`
 
 
 
@@ -674,6 +1033,39 @@ sumar_xyz(1, 2, 0.4)
 ## [1] 3.4
 ```
 
+---
+background-image: url("imagenes/fondo2.PNG")
+background-size: contain;
+background-position: 100% 0%
+
+# Ejercicio funciones
+
+Crea una función que reciba un vector numérico y devuelva en un vector o en una lista los siguientes valores:
+
+- media
+- mínimo
+- máximo
+- mediana
+- percentil 1
+- percentil 99
+
+Puedes probar tu función con el siguiente vector `rnorm(10000)`
+
+--
+
+
+```r
+get_stats &lt;- function(x) {
+  return(c(mean(x), min(x), max(x), median(x), quantile(x, 0.01), quantile(x, 0.99)))
+}
+set.seed(123)
+get_stats(rnorm(n = 10000))
+```
+
+```
+##                                                               1%          99% 
+## -0.002371702 -3.845320169  3.847767706 -0.011089219 -2.318682909  2.338747795
+```
 
 
 ---
@@ -851,932 +1243,19 @@ eval_tidy(expr("un" + "saludo"), env =  ambiente_esoterico  )
 ### Esto es una herramienta poderosa para desarrollar paquetes o aplicaciones
 
 
-
----
-
-
-class: inverse, center, middle
-
-# III. functionals 
-
----
-
-background-image: url("imagenes/fondo2.PNG")
-background-size: contain;
-background-position: 100% 0%
-
-# Introducción a funcionales (functionals)
-
-
-*"To become significantly more reliable, code must become more transparent. In particular, nested conditions and loops must be viewed with great suspicion. Complicated control flows confuse programmers. Messy code often hides bugs."*
-
-- Bjarne Stroustrup
-
---
-
-Una "funcional" (*functional*) es una función que recibe como input otra función
-
-
-```r
-randomise &lt;- function(f) f(runif(10))
-```
---
-
-`randomise` recibe una función y hace algo con un vector de 10 números aleatorios
-
-
-```r
-randomise(mean)
-```
-
-```
-## [1] 0.4345167
-```
-
-```r
-randomise(sum)
-```
-
-```
-## [1] 5.962768
-```
-
-```r
-randomise(median)
-```
-
-```
-## [1] 0.342984
-```
-
-
-
-
-
----
-
-background-image: url("imagenes/fondo2.PNG")
-background-size: contain;
-background-position: 100% 0%
-
-# Introducción a funcionales (functionals)
-
-Es muy probable que ustedes hayan usados funcionales con `R` base
-
-- `apply`, `lapply`, `sapply` 
-
---
-
-Los loops tienen mala fama en `R`
-
---
-
-Típicamente, las funcionales se usan como alternativa a los *loops*
-
---
-
-Nosotros trabajaremos con el paquete `purrr`
-
-
-```r
-library(purrr)
-```
-
-
-.center[
-&lt;img src="imagenes/purrr.png" width="200" /&gt;
-]
-
-
-
 ---
 background-image: url("imagenes/fondo2.PNG")
 background-size: contain;
 background-position: 100% 0%
 
-# Mi primera funcional
+# Contenidos próxima clase
 
-Función que calcula el triple del input
+- Estudiaremos como programar con `dplyr` mediante evaluaciones no estándar (NSE)
 
+- Revisaremos contenidos de programación funcional 
 
-```r
-triple &lt;- function(x) x * 3
-```
 
---
-
-`map` lleva el vector `1:3` hacia la función triple
-
-
-```r
-map(1:3, triple)
-```
-
-```
-## [[1]]
-## [1] 3
-## 
-## [[2]]
-## [1] 6
-## 
-## [[3]]
-## [1] 9
-```
-
-
-
-.center[
-&lt;img src="https://d33wubrfki0l68.cloudfront.net/f0494d020aa517ae7b1011cea4c4a9f21702df8b/2577b/diagrams/functionals/map.png" width="200" /&gt;
-]
-
-
----
-background-image: url("imagenes/fondo2.PNG")
-background-size: contain;
-background-position: 100% 0%
-
-# ¿Qué tienen que ver los mapas?
-
-.center[
-&lt;img src="imagenes/mapa.png" width="400" /&gt;
-]
-
-
---
-
-.center[
-&lt;img src="imagenes/mapear_funcion.png" width="400" /&gt;
-]
-
-
----
-background-image: url("imagenes/fondo2.PNG")
-background-size: contain;
-background-position: 100% 0%
-
-# Ventajas de purrr
-
-Permite abstraernos de lo que hace la función
-
---
-
-Tenemos claridad de lo que entra y sale de la función 
-
-- `map` devuelve una lista
-- `map_int` devuelve vector de enteros
-- `map_dbl` devuelve vector de reales
-- `map_chr` devuelve vector de characters
-- `map_df` devuelve un dataframe
-
-
-```r
-triple_chr &lt;- function(x) as.character(x * 3)
-map_int(1:3, triple_chr)
-```
-
-```
-## Error: Can't coerce element 1 from a character to a integer
-```
-
-```r
-map_chr(1:3, triple_chr)
-```
-
-```
-## [1] "3" "6" "9"
-```
-
-
----
-
-background-image: url("imagenes/fondo2.PNG")
-background-size: contain;
-background-position: 100% 0%
-
-# Trabajando con listas anidadas
-
-### La función `mean` se evalúa en cada uno de los vectores de la lista
-
-
-```r
-lista_vectores &lt;- list(1:3, 1:10, 2:9, 1)
-map_dbl(lista_vectores, mean)
-```
-
-```
-## [1] 2.0 5.5 5.5 1.0
-```
---
-
-### ¿Cómo uso esto en un dataframe?
-
-
-.center[
-&lt;img src="https://media.giphy.com/media/xUPGcz2H1TXdCz4suY/giphy.gif" width="150" /&gt;
-]
-
-
----
-
-background-image: url("imagenes/fondo2.PNG")
-background-size: contain;
-background-position: 100% 0%
-
-# Trabajando con dataframes
-
-### En `R`, los `dataframes` son listas con vectores de la misma longitud
-
-
-```r
-typeof(mtcars)
-```
-
-```
-## [1] "list"
-```
---
-
-
-```r
-map_dbl(mtcars, mean)
-```
-
-```
-##        mpg        cyl       disp         hp       drat         wt       qsec 
-##  20.090625   6.187500 230.721875 146.687500   3.596563   3.217250  17.848750 
-##         vs         am       gear       carb 
-##   0.437500   0.406250   3.687500   2.812500
-```
-
-.center[
-&lt;img src="https://media.giphy.com/media/l3V0dy1zzyjbYTQQM/giphy.gif" width="250" /&gt;
-]
-
-
-
-
-
----
-background-image: url("imagenes/fondo2.PNG")
-background-size: contain;
-background-position: 100% 0%
-
-# Trabajando con más argumentos
-
-### ¿Qué pasa si queremos usar más argumentos?
-
-
-```r
-lista_vectores &lt;- list(1:3, c(1:10, NA))
-map_dbl(lista_vectores, ~mean(.x, na.rm = TRUE))
-```
-
-```
-## [1] 2.0 5.5
-```
-
-`.x` toma el valor de los elementos que están dentro de `lista_vectores` 
-
-El parámetro que varía va a la izquierda y el parámetro fijo a la derecha
-
---
-
-.center[
-&lt;img src="https://d33wubrfki0l68.cloudfront.net/e1b3536a7556aef348f546a79277125c419a5fdc/0c0a1/diagrams/functionals/map-arg.png" width="400" /&gt;
-]
-
-
-
----
-
-background-image: url("imagenes/fondo2.PNG")
-background-size: contain;
-background-position: 100% 0%
-
-# Usando 2 inputs 
-
-### La función `media_sumar` calcula la media y suma un valor
-
-
-```r
-media_sumar &lt;- function(vector, valor) {
-  mean(vector) + valor
-}
-```
-
-### Queremos que la función itere sobre `lista_vectores` y sobre `valores`
-
-
-```r
-lista_vectores &lt;- list(1:3, 1:5, 2:5)
-valores &lt;- c(2, 3, 8)
-```
-
---
-
-
-```r
-map2_dbl(lista_vectores, valores, media_sumar)
-```
-
-```
-## [1]  4.0  6.0 11.5
-```
-
-.center[
-&lt;img src="https://d33wubrfki0l68.cloudfront.net/f5cddf51ec9c243a7c13732b0ce46b0868bf8a31/501a8/diagrams/functionals/map2.png" width="300" /&gt;
-]
-
-
-
----
-
-background-image: url("imagenes/fondo2.PNG")
-background-size: contain;
-background-position: 100% 0%
-
-# Usando *n* cantidad de inputs 
-
-### Necesitamos iterar sobre 3 vectores
-
-
-```r
-media_sumar_dividir &lt;- function(vector, valor_suma, valor_division) {
-  (mean(vector) + valor_suma) / valor_division
-}
-
-lista_vectores &lt;- list(1:3, 1:5, 2:5)
-valores_suma &lt;- c(2, 3, 8)
-valores_division &lt;- c(2, 1, 9)
-```
-
---
-
-
-```r
-pmap_dbl(list(lista_vectores, valores_suma, valores_division), media_sumar_dividir)
-```
-
-```
-## [1] 2.000000 6.000000 1.277778
-```
-
-
-.center[
-&lt;img src="https://d33wubrfki0l68.cloudfront.net/2eb2eefe34ad6d114da2a22df42deac8511b4788/5a538/diagrams/functionals/pmap-arg.png" width="300" /&gt;
-]
-
-
-
----
-
-background-image: url("imagenes/fondo2.PNG")
-background-size: contain;
-background-position: 100% 0%
-
-# Trabajar con *side-effects* 
-
-### A veces, nos interesa una función por sus *side-effects*
-
-
-```r
-animales &lt;- c("perro", "gato", "elefante")
-map(animales, print)
-```
-
-```
-## [1] "perro"
-## [1] "gato"
-## [1] "elefante"
-```
-
-```
-## [[1]]
-## [1] "perro"
-## 
-## [[2]]
-## [1] "gato"
-## 
-## [[3]]
-## [1] "elefante"
-```
---
-
-### `map` está creando una lista y, además, está imprimiendo los valores
-
----
-
-background-image: url("imagenes/fondo2.PNG")
-background-size: contain;
-background-position: 100% 0%
-
-# Usando walk
-
-
-.center[
-&lt;img src="imagenes/walk.jpg" width="350" /&gt;
-]
-
---
-
-
-```r
-walk(animales, print)
-```
-
-```
-## [1] "perro"
-## [1] "gato"
-## [1] "elefante"
-```
-
-### Ahora solo estamos imprimiendo los strings
-
----
-background-image: url("imagenes/fondo2.PNG")
-background-size: contain;
-background-position: 100% 0%
-
-# Usando `walk`
-
-### Necesito escribir archivos  
-
-
-
-
-
-```r
-continentes &lt;- split(gapminder, gapminder$continent)
-```
-
-
-```r
-library(feather)
-files &lt;- paste0("data/", names(continentes), ".feather")
-walk2(continentes, files, write_feather)
-```
-
-
----
-
-
-class: inverse, center, middle
-
-# IV. Programación con dplyr
-
-
----
-
-background-image: url("imagenes/fondo2.PNG")
-background-size: contain;
-background-position: 100% 0%
-
-# Introducción a la programación con dplyr
-
-### ¿Han intentado programar una función usando dplyr?
-
---
-
-### Queremos una función que calcule mínimo, máximo, media y mediana 
-
-
-```r
-calcular_cosas &lt;- function(data, var) {
-  data %&gt;% 
-    summarise(min = min(var),
-              max = max(var),
-              mean = mean(var),
-              median = median(var)
-              )
-}
-
-calcular_cosas(gapminder, pop)
-```
-
-```
-## Error: Problem with `summarise()` input `min`.
-## x objeto 'pop' no encontrado
-## i Input `min` is `min(var)`.
-```
-
-
-.center[
-&lt;img src="https://media.giphy.com/media/xUPGcz2H1TXdCz4suY/giphy.gif" width="150" /&gt;
-]
-
-
----
-
-background-image: url("imagenes/fondo2.PNG")
-background-size: contain;
-background-position: 100% 0%
-
-# Introducción a la programación con dplyr
-
-### Cambiemos un par de cosas
-
-
-
-```r
-library(rlang)
-calcular_cosas &lt;- function(data, var) {
-  enquo_var &lt;- enexpr(var)
-
-  data %&gt;% 
-    summarise(min = min(!!enquo_var),
-              max = max(!!enquo_var),
-              mean = mean(!!enquo_var),
-              median = median(!!enquo_var)
-              )
-}
-
-calcular_cosas(gapminder, pop)
-```
-
-```
-## # A tibble: 1 x 4
-##     min        max      mean   median
-##   &lt;int&gt;      &lt;int&gt;     &lt;dbl&gt;    &lt;dbl&gt;
-## 1 60011 1318683096 29601212. 7023596.
-```
-
-
----
-background-image: url("imagenes/fondo2.PNG")
-background-size: contain;
-background-position: 100% 0%
-
-# Evaluaciones no estándar
-
-### En `R`, los argumentos pueden ser *evaluados* o *quoted* (¿citados?)  
-
-- evaluados: situación más usual en R
-- quoted: los argumentos son procesados de una manera "atípica" (evaluación no estándar)
-
---
-
-### Para saber si un argumento es quoted o evaluado, simplemente ejecutamos el argumento fuera de la función
-
-
-```r
-pop
-```
-
-```
-## Error in eval(expr, envir, enclos): objeto 'pop' no encontrado
-```
---
-
-### Si la ejecución no funciona, el argumento es quoted
-
-
----
-background-image: url("imagenes/fondo2.PNG")
-background-size: contain;
-background-position: 100% 0%
-
-# Ejemplos de argumentos quoted y evaluados
-
-### Argumentos evaluados
-
-
-```r
-sum(mtcars$am)
-class(mtcars)
-```
-
---
-
-### Argumentos quoted
-
-
-```r
-library(dplyr)
-
-by_cyl &lt;- mtcars %&gt;%
-  summarise(mean = mean(mpg)) 
-
-calcular_cosas(gapminder, pop) # &lt;&lt;
-```
-
----
-background-image: url("imagenes/fondo2.PNG")
-background-size: contain;
-background-position: 100% 0%
-
-# Expresiones
-
-### Evaluar de manera no estándar consiste en atrapar expresiones y evaluarlas en otro momento
-
-
-```r
-expr(x + y)
-```
-
-```
-## x + y
-```
---
-
-
-
-
-```r
-devolver_expresion &lt;- function(x) {
-  expr(x)
-}
-
-devolver_expresion(a + b)
-```
-
-```
-## x
-```
-### La función `expr` es demasiado literal
-
---
-
-### Podemos usar enexpr (enrich) 
-
-
-```r
-devolver_expresion &lt;- function(x) {
-  enexpr(x)
-}
-
-devolver_expresion(a + b)
-```
-
-```
-## a + b
-```
-
-
-
----
-
-background-image: url("imagenes/fondo2.PNG")
-background-size: contain;
-background-position: 100% 0%
-
-# Expresiones
-
-### Volviendo a nuestra función `calcular_cosas`...
- 
-
-```r
-calcular_cosas &lt;- function(data, var) {
-* enquo_var &lt;- enexpr(var)
-
-  data %&gt;% 
-    summarise(min = min(!!enquo_var),
-              max = max(!!enquo_var),
-              mean = mean(!!enquo_var),
-              median = median(!!enquo_var)
-              )
-}
-```
-
---
-
-### Ya sabemos qué significa la primera línea
-
-
---
-
-
-
-```r
-calcular_cosas &lt;- function(data, var) {
-  enquo_var &lt;- enexpr(var) 
-  return(enquo_var)
-}
-calcular_cosas(var = pop)
-```
-
-```
-## pop
-```
-
-
-
-
-
----
-background-image: url("imagenes/fondo2.PNG")
-background-size: contain;
-background-position: 100% 0%
-
-# Expresiones
-
-### ¿Qué significa esto `min(!!enquo_var)` ?
-
-
-.center[
-&lt;img src="https://media.giphy.com/media/xUPGcz2H1TXdCz4suY/giphy.gif" width="150" /&gt;
-]
-
-
---
-
-### Una vez que la expresión se "congela", es necesario evaluarla
-
-### El operador bang-bang (!!) hace *unquoting*
-
---
-
-
-```r
-calcular_cosas &lt;- function(data, var) {
-  enquo_var &lt;- enexpr(var) 
-
-  data %&gt;% 
-*   summarise(min = min(!!enquo_var))
-}
-calcular_cosas(gapminder, pop)
-```
-
-```
-## # A tibble: 1 x 1
-##     min
-##   &lt;int&gt;
-## 1 60011
-```
-
-### Estamos evaluando la variable enquo_var
-
----
-background-image: url("imagenes/fondo2.PNG")
-background-size: contain;
-background-position: 100% 0%
-
-# Usar el código del usuario 
-
-### ¿Qué pasa si queremos una función que use el nombre de un parámetro, para nombrar una variable?
-
-
-### Idea número 1
-
-
-```r
-calcular_cosas &lt;- function(data, var) {
-  enquo_var &lt;- enexpr(var) 
-
-  data %&gt;% 
-*   summarise(var = min(!!enquo_var))
-}
-calcular_cosas(gapminder, pop)
-```
-
-```
-## # A tibble: 1 x 1
-##     var
-##   &lt;int&gt;
-## 1 60011
-```
-
---
-
-### `R` fue demasiado literal. Usó el nombre "var"
-
----
-
-background-image: url("imagenes/fondo2.PNG")
-background-size: contain;
-background-position: 100% 0%
-
-# Usar el código del usuario 
-
-### Idea número 2
-
-
-```r
-calcular_cosas &lt;- function(data, var) {
-  enquo_var &lt;- enexpr(var) 
-
-  data %&gt;% 
-    summarise(!!enquo_var = min(!!enquo_var)) 
-}
-calcular_cosas(gapminder, pop)
-```
-
-```
-## Error: &lt;text&gt;:5:27: inesperado '='
-## 4:   data %&gt;% 
-## 5:     summarise(!!enquo_var =
-##                              ^
-```
-
----
-
-background-image: url("imagenes/fondo2.PNG")
-background-size: contain;
-background-position: 100% 0%
-
-# Operador :=
-
-### Debemos resolver el problema con un nuevo operador
-
-
-```r
-calcular_cosas &lt;- function(data, var) {
-  enquo_var &lt;- enexpr(var) 
-
-  data %&gt;% 
-*   summarise(!!enquo_var := min(!!enquo_var))
-}
-calcular_cosas(gapminder, pop)
-```
-
-```
-## # A tibble: 1 x 1
-##     pop
-##   &lt;int&gt;
-## 1 60011
-```
---
-
-### Si queremos entregar un string como input podemos usar `sym` 
-
-### `sym` convierte un string en un símbolo. Esta operación se denomina *parsing*
-
-
-```r
-calcular_cosas &lt;- function(data, var) {
-  enquo_var &lt;- sym(var)
-  data %&gt;% 
-*   summarise(!!enquo_var  := min(!!enquo_var))
-}
-calcular_cosas(gapminder, "pop")
-```
-
-```
-## # A tibble: 1 x 1
-##     pop
-##   &lt;int&gt;
-## 1 60011
-```
-
----
-background-image: url("imagenes/fondo2.PNG")
-background-size: contain;
-background-position: 100% 0%
-
-# Parsing
-
-### Otra opción es usar la función `parse_expr` de `rlang`
-
-
-```r
-calcular_cosas &lt;- function(data, var) {
-* enquo_var &lt;- parse_expr(var)
-  data %&gt;% 
-    summarise(!!enquo_var  := min(!!enquo_var))
-}
-calcular_cosas(gapminder, "pop")
-```
-
-```
-## # A tibble: 1 x 1
-##     pop
-##   &lt;int&gt;
-## 1 60011
-```
----
-background-image: url("imagenes/fondo2.PNG")
-background-size: contain;
-background-position: 100% 0%
-
-# Nueva sintaxis
-
-### Hace un tiempo existe el operador embrace `{{}}`
-
-
-```r
-calcular_cosas &lt;- function(data, var) {
-  data %&gt;% 
-    summarise({{var}} := min({{var}}))
-}
-calcular_cosas(gapminder, pop)
-```
-
-```
-## # A tibble: 1 x 1
-##     pop
-##   &lt;int&gt;
-## 1 60011
-```
-
---
-
-### Este operador nos hubiera evitado la vuelta que dimo, pero no habríamos aprendido sobre evaluaciones no estándar 
-
-.center[
-# 🤓
-
-]
-
-
+### Es importante asimilar los contenidos de esta clase sobre funciones
 
 ---
 background-image: url("imagenes/fondo2.PNG")
@@ -1784,6 +1263,109 @@ background-size: contain;
 background-position: 100% 0%
 
 # Tarea para la 🏠
+
+**Ejercicio 1**
+
+Construye una función llamada `get_cv` que calcule el coeficiente de variación de un vector. `get_cv` debe recibir 2 parámetros:
+
+- un vector de tamaño `n`
+- un valor `boolean` que indique si los valores NA deben ser removidos. Por defecto, la función **no** debe remover dichos valores.
+
+En la construcción de la función no está permitido utilizar la función `cv`, pero sí `mean` y `sd`
+
+La fórmula para calcular el coeficiente de variación es `\(cv = \frac{sd}{\bar{X}}\)`
+
+
+---
+
+background-image: url("imagenes/fondo2.PNG")
+background-size: contain;
+background-position: 100% 0%
+
+# Tarea para la 🏠
+
+**Ejercicio 2**
+
+Crea una función llamada `build_address` que construya una dirección en base a algunos *inputs*, siguiendo un formato establecido. `build_address` recibe 2 parámetros obligatorios y uno opcional. 
+
+Parámetros obligatorios:
+
+- *street*: string que contiene el nombre de la calle
+- *number*: string que contiene el número de la dirección  
+
+El parámetro opcional es *apartment* y contiene el número del departamento. 
+
+A continuación se muestra un ejemplo del resultado esperado
+
+
+```r
+street &lt;- "calle Los Alerces"
+number &lt;- "número 123"
+build_address(street, number)
+```
+
+
+```
+## [1] "los alerces 123"
+```
+
+---
+
+background-image: url("imagenes/fondo2.PNG")
+background-size: contain;
+background-position: 100% 0%
+
+# Tarea para la 🏠
+
+Si la vivienda se encuentra en un departamento, el formato esperado es **"los alerces 123, depto. 34"**
+
+Considere que no existe un formato preestablecido para registrar calle y número, lo que implica que la función debe procesar cosas como: "numero 123", "123", "num 123", "número 123", "n 123". Análogamente, la calle podría estar descrita de diferentes modos: "avenida Los Alerces", "Los Alerces", "av. Los Alerces", "calle los alerces", "pasaje Los Alerces", "los alerces", etc.    
+
+**Independiente de lo que reciba la función, el formato siempre debe ser:  NOMBRE CALLE, NÚMERO, DEPTO.** 
+
+En la construcción de `build_address` puede usar cualquier función que sea de utilidad para lograr el objetivo. No es necesario que la función sea capaz de procesar todos los casos posibles.
+
+---
+
+background-image: url("imagenes/fondo2.PNG")
+background-size: contain;
+background-position: 100% 0%
+
+# Tarea para la 🏠
+
+**Ejercicio 3**
+
+Utilice la función creada sobre el siguiente `dataframe`, generando una nueva columna llamada dirección.  
+
+
+
+```r
+df &lt;- tribble(~calle,              ~numero,      ~depto,
+              "calle Hemingway",   "num 345",    "depto. 345",
+              "av. Albert Camus",  "número 123", "123",
+              "Manuel Rojas",      "234",        "departamento 231",
+              "Nicanor Parra",     "678",        NULL
+              ) 
+df
+```
+
+```
+## # A tibble: 4 x 3
+##   calle            numero     depto    
+##   &lt;chr&gt;            &lt;chr&gt;      &lt;list&gt;   
+## 1 calle Hemingway  num 345    &lt;chr [1]&gt;
+## 2 av. Albert Camus número 123 &lt;chr [1]&gt;
+## 3 Manuel Rojas     234        &lt;chr [1]&gt;
+## 4 Nicanor Parra    678        &lt;NULL&gt;
+```
+
+
+
+
+
+
+ 
+
 
 ---
 
@@ -1795,6 +1377,8 @@ class: center, middle
 &lt;img src="imagenes/logo_portada2.png" width="200" /&gt;
 
 ## Capacitación en R intermedio
+
+## dplyr y funciones
 
 ## Proyecto Estratégico Servicios Compartidos para la Producción Estadística
 

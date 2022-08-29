@@ -48,7 +48,7 @@ background-position: 100% 0%
 
 # Estructura del taller
 
-**Objetivos de la clase**
+**Contenidos de la clase**
 
 - `rowwise`: operaciones por fila
 
@@ -61,7 +61,7 @@ background-position: 100% 0%
 - Repaso de funciones en `R`
 
 
-Objetivos del taller:
+**Objetivos de la clase:**
 
 - Revisar algunos contenidos de `dplyr` no tan conocidos 
 
@@ -161,7 +161,6 @@ background-position: 100% 0%
 df <- tibble(
   x = list(1, 2:3, 4:6)
 )
-df
 ```
 --
 
@@ -312,7 +311,7 @@ Tenemos las siguientes fuentes de ingreso a nivel de persona:
 - *y0101c* (ingreso trabajo dependiente)
 - *y0701c* (ingreso trabajo independiente)
 
-Queremos saber cuál es el mayor de estos valores a nivel de hogar. La idea es usar `rowwise`. 
+Queremos crear una columna que contenga es el mayor de estos valores a nivel de hogar. La idea es usar `rowwise`. 
 
 --
 
@@ -529,7 +528,7 @@ background-position: 100% 0%
 
 ```{r}
 
-hacer_calculos <- function(x) {
+do_silly_stuff <- function(x) {
   normalizar <-  (x - min(x)) / (max(x) - min(x))
   norm_media <-  normalizar + mean(normalizar)
   norm_mediana <- norm_media / median(norm_media)
@@ -537,7 +536,7 @@ hacer_calculos <- function(x) {
 }
 
 mtcars2 <- mtcars %>% 
-  mutate_at(vars(mpg, disp),  list(norm = hacer_calculos) ) 
+  mutate_at(vars(mpg, disp),  list(norm = do_silly_stuff) ) 
 
 ```
 
@@ -551,7 +550,7 @@ mtcars2 <- mtcars %>%
 
 ```{r}
 mtcars2 <- mtcars %>% 
-  mutate_at(vars(mpg, disp),  list(norm = ~hacer_calculos(.) ) ) 
+  mutate_at(vars(mpg, disp),  list(norm = ~do_silly_stuff(.) ) ) 
 ```
 
 
@@ -944,6 +943,215 @@ set.seed(123)
 get_stats(rnorm(n = 10000))
 
 ```
+
+
+---
+background-image: url("imagenes/fondo2.PNG")
+background-size: contain;
+background-position: 100% 0%
+
+# Funciones de orden superior
+
+Son funciones que reciben como argumento una función
+
+--
+
+```{r}
+
+vectorized_function <- function(x, func) {
+  new_x <-  do_silly_stuff(x)
+  out <-  func(new_x)
+  return(out)
+}
+
+vectorized_function(c(rnorm(10)), mean)
+```
+--
+
+Se utilizan para hacer abstracciones
+
+--
+
+Sumemos números enteros
+
+```{r}
+sum_integers <- function(n) {
+  total <- 0
+  for (i in 1:n) {
+    total <- total + i
+  }
+  return(total)
+}
+```
+
+---
+
+background-image: url("imagenes/fondo2.PNG")
+background-size: contain;
+background-position: 100% 0%
+
+# Funciones de orden superior
+
+Función para sumar log10
+
+```{r}
+sum_log10 <- function(n) {
+  total <- 0
+  for (i in 1:n) {
+    total <- total + log10(i)
+  }
+  return(total)
+}
+```
+
+
+--
+
+Función para sumar cuadrados
+
+```{r}
+sum_power <- function(n) {
+  total <- 0
+  for (i in 1:n) {
+    total <- total + i**2
+  }
+  return(total)
+}
+
+```
+
+
+### Todas las funciones tienen algo en común
+
+---
+
+background-image: url("imagenes/fondo2.PNG")
+background-size: contain;
+background-position: 100% 0%
+
+# Abstracciones con funciones
+
+Función genérica para sumar cosas  
+
+```{r}
+sum_something <- function(n, func) {
+  total <- 0
+  for (i in 1:n) {
+    total <- total + func(i)
+  }
+  return(total)
+  
+}
+
+```
+
+
+--
+
+Ahora creamos las funciones básicas
+
+```{r}
+power2 <- function(x) {x**2}
+
+identity <- function(x) {x}
+```
+
+--
+
+Utilizamos la abstracción
+
+```{r}
+sum_something(10, log10)
+sum_something(10, power2)
+
+```
+
+
+---
+
+background-image: url("imagenes/fondo2.PNG")
+background-size: contain;
+background-position: 100% 0%
+
+# Fábricas de funciones
+
+Este contenido está fuera del curso, pero aconsejo revisarlo
+
+--
+
+Las fábricas de funciones son funciones que retornan funciones
+
+--
+
+**Motivación:** En R base no existe una función para calcular raíz de manera general
+
+Existe `sqrt` para el caso particular de raíz cuadrada
+
+--
+
+```{r}
+factory_root <- function(power_input) {
+  new_power <- function(x) {
+    x**(1/power_input)    
+  }
+  return(new_power)
+}
+root2 <- factory_root(2)
+root3 <- factory_root(3)
+root4 <- factory_root(4)
+
+
+```
+
+`factory_root` nos permite crear funciones para cualquier raíz
+
+---
+
+background-image: url("imagenes/fondo2.PNG")
+background-size: contain;
+background-position: 100% 0%
+
+# Fábricas de funciones
+
+¿Por qué no mejor crear simplemente una función que haga lo mismo?
+
+```{r}
+general_root <- function(x, power) {x**(1/power)}
+
+```
+
+--
+
+Queremos una función que agregue "un print" a cualquier función
+
+--
+
+
+```{r}
+add_print <- function(func) {
+  string_function <-  rlang::as_string(rlang::ensym(func))
+  new_function <- function(x) { #<<
+    result <- func(x) #<<
+    print(paste0("El resultado de ", string_function,  ": ", result )) #<<
+    return(result) #<<
+  }
+  return(new_function)
+}
+
+mean_print <- add_print(mean)
+mean_print(c(1,2,3))
+
+```
+
+
+
+---
+
+background-image: url("imagenes/fondo2.PNG")
+background-size: contain;
+background-position: 100% 0%
+
+# Comentario al margen sobre funciones infix
 
 
 ---

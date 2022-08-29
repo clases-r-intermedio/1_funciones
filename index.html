@@ -4,7 +4,7 @@
     <title>Capacitación paquete calidad</title>
     <meta charset="utf-8" />
     <meta name="author" content="" />
-    <meta name="date" content="2022-07-15" />
+    <meta name="date" content="2022-08-29" />
     <link rel="stylesheet" href="xaringan-themer.css" type="text/css" />
   </head>
   <body>
@@ -38,7 +38,7 @@ background-position: 100% 0%
 
 # Estructura del taller
 
-**Objetivos de la clase**
+**Contenidos de la clase**
 
 - `rowwise`: operaciones por fila
 
@@ -51,7 +51,7 @@ background-position: 100% 0%
 - Repaso de funciones en `R`
 
 
-Objetivos del taller:
+**Objetivos de la clase:**
 
 - Revisar algunos contenidos de `dplyr` no tan conocidos 
 
@@ -84,7 +84,7 @@ mtcars %&gt;%
 ```
 
 ```
-## # A tibble: 3 x 2
+## # A tibble: 3 × 2
 ##    gear media
 ##   &lt;dbl&gt; &lt;dbl&gt;
 ## 1     3 176. 
@@ -144,7 +144,6 @@ background-position: 100% 0%
 df &lt;- tibble(
   x = list(1, 2:3, 4:6)
 )
-df
 ```
 --
 
@@ -159,7 +158,7 @@ df %&gt;%
 ```
 
 ```
-## # A tibble: 3 x 2
+## # A tibble: 3 × 2
 ##   x         largo
 ##   &lt;list&gt;    &lt;int&gt;
 ## 1 &lt;dbl [1]&gt;     3
@@ -206,7 +205,7 @@ df %&gt;%
 ```
 
 ```
-## # A tibble: 3 x 2
+## # A tibble: 3 × 2
 ## # Rowwise: 
 ##   x         largo
 ##   &lt;list&gt;    &lt;int&gt;
@@ -249,12 +248,12 @@ df2
 ```
 
 ```
-## # A tibble: 3 x 4
-##       n   min   max    data
-##   &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;   &lt;dbl&gt;
-## 1     4     0     1   0.407
-## 2     2    10   100  71.1  
-## 3     3   100  1000 910.
+## # A tibble: 3 × 4
+##       n   min   max     data
+##   &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;    &lt;dbl&gt;
+## 1     4     0     1   0.0891
+## 2     2    10   100  29.6   
+## 3     3   100  1000 930.
 ```
 ---
 background-image: url("imagenes/fondo2.PNG")
@@ -276,7 +275,7 @@ df2$data[1]
 
 ```
 ## [[1]]
-## [1] 0.31760272 0.28945572 0.05888814 0.24164449
+## [1] 0.7012479 0.9848877 0.1639326 0.1989715
 ```
 
 --
@@ -304,7 +303,7 @@ toc()
 ```
 
 ```
-## 3.36 sec elapsed
+## 1.96 sec elapsed
 ```
 
 --
@@ -340,7 +339,7 @@ Tenemos las siguientes fuentes de ingreso a nivel de persona:
 - *y0101c* (ingreso trabajo dependiente)
 - *y0701c* (ingreso trabajo independiente)
 
-Queremos saber cuál es el mayor de estos valores a nivel de hogar. La idea es usar `rowwise`. 
+Queremos crear una columna que contenga es el mayor de estos valores a nivel de hogar. La idea es usar `rowwise`. 
 
 --
 
@@ -358,7 +357,7 @@ casen2 %&gt;%
 ```
 
 ```
-## # A tibble: 185,437 x 7
+## # A tibble: 185,437 × 7
 ##         folio     max  maximo y2803c  ytro  y0101c y0701c
 ##         &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt;   &lt;dbl&gt;  &lt;dbl&gt;
 ##  1 1101100101  150000  150000      0     0       0 150000
@@ -371,7 +370,7 @@ casen2 %&gt;%
 ##  8 1101100103       0 3000000      0     0       0      0
 ##  9 1101100104       0       0      0     0       0      0
 ## 10 1101100104       0       0      0     0       0      0
-## # ... with 185,427 more rows
+## # … with 185,427 more rows
 ```
 
 
@@ -545,7 +544,7 @@ casen2 %&gt;%
 ```
 
 ```
-## # A tibble: 4 x 3
+## # A tibble: 4 × 3
 ##        folio ytotcor ytotcor_hog
 ##        &lt;dbl&gt;   &lt;dbl&gt;       &lt;dbl&gt;
 ## 1 1101100101  310833      390833
@@ -603,7 +602,7 @@ background-position: 100% 0%
 
 
 ```r
-hacer_calculos &lt;- function(x) {
+do_silly_stuff &lt;- function(x) {
   normalizar &lt;-  (x - min(x)) / (max(x) - min(x))
   norm_media &lt;-  normalizar + mean(normalizar)
   norm_mediana &lt;- norm_media / median(norm_media)
@@ -611,7 +610,7 @@ hacer_calculos &lt;- function(x) {
 }
 
 mtcars2 &lt;- mtcars %&gt;% 
-  mutate_at(vars(mpg, disp),  list(norm = hacer_calculos) ) 
+  mutate_at(vars(mpg, disp),  list(norm = do_silly_stuff) ) 
 ```
 
 .center[
@@ -625,7 +624,7 @@ mtcars2 &lt;- mtcars %&gt;%
 
 ```r
 mtcars2 &lt;- mtcars %&gt;% 
-  mutate_at(vars(mpg, disp),  list(norm = ~hacer_calculos(.) ) ) 
+  mutate_at(vars(mpg, disp),  list(norm = ~do_silly_stuff(.) ) ) 
 ```
 
 
@@ -991,9 +990,6 @@ print(sumar_xyz(1, 2))
 
 ```
 ## Error in py_call_impl(callable, dots$args, dots$keywords): TypeError: sumar_xyz() missing 1 required positional argument: 'z'
-## 
-## Detailed traceback:
-##   File "&lt;string&gt;", line 1, in &lt;module&gt;
 ```
 
 ### `python` utiliza *call by value* (CBV)
@@ -1066,6 +1062,240 @@ get_stats(rnorm(n = 10000))
 ##                                                               1%          99% 
 ## -0.002371702 -3.845320169  3.847767706 -0.011089219 -2.318682909  2.338747795
 ```
+
+
+---
+background-image: url("imagenes/fondo2.PNG")
+background-size: contain;
+background-position: 100% 0%
+
+# Funciones de orden superior
+
+Son funciones que reciben como argumento una función
+
+--
+
+
+```r
+vectorized_function &lt;- function(x, func) {
+  new_x &lt;-  do_silly_stuff(x)
+  out &lt;-  func(new_x)
+  return(out)
+}
+
+vectorized_function(c(rnorm(10)), mean)
+```
+
+```
+## [1] 1.081107
+```
+--
+
+Se utilizan para hacer abstracciones
+
+--
+
+Sumemos números enteros
+
+
+```r
+sum_integers &lt;- function(n) {
+  total &lt;- 0
+  for (i in 1:n) {
+    total &lt;- total + i
+  }
+  return(total)
+}
+```
+
+---
+
+background-image: url("imagenes/fondo2.PNG")
+background-size: contain;
+background-position: 100% 0%
+
+# Funciones de orden superior
+
+Función para sumar log10
+
+
+```r
+sum_log10 &lt;- function(n) {
+  total &lt;- 0
+  for (i in 1:n) {
+    total &lt;- total + log10(i)
+  }
+  return(total)
+}
+```
+
+
+--
+
+Función para sumar cuadrados
+
+
+```r
+sum_power &lt;- function(n) {
+  total &lt;- 0
+  for (i in 1:n) {
+    total &lt;- total + i**2
+  }
+  return(total)
+}
+```
+
+
+### Todas las funciones tienen algo en común
+
+---
+
+background-image: url("imagenes/fondo2.PNG")
+background-size: contain;
+background-position: 100% 0%
+
+# Abstracciones con funciones
+
+Función genérica para sumar cosas  
+
+
+```r
+sum_something &lt;- function(n, func) {
+  total &lt;- 0
+  for (i in 1:n) {
+    total &lt;- total + func(i)
+  }
+  return(total)
+  
+}
+```
+
+
+--
+
+Ahora creamos las funciones básicas
+
+
+```r
+power2 &lt;- function(x) {x**2}
+
+identity &lt;- function(x) {x}
+```
+
+--
+
+Utilizamos la abstracción
+
+
+```r
+sum_something(10, log10)
+```
+
+```
+## [1] 6.559763
+```
+
+```r
+sum_something(10, power2)
+```
+
+```
+## [1] 385
+```
+
+
+---
+
+background-image: url("imagenes/fondo2.PNG")
+background-size: contain;
+background-position: 100% 0%
+
+# Fábricas de funciones
+
+Este contenido está fuera del curso, pero aconsejo revisarlo
+
+--
+
+Las fábricas de funciones son funciones que retornan funciones
+
+--
+
+**Motivación:** En R base no existe una función para calcular raíz de manera general
+
+Existe `sqrt` para el caso particular de raíz cuadrada
+
+--
+
+
+```r
+factory_root &lt;- function(power_input) {
+  new_power &lt;- function(x) {
+    x**(1/power_input)    
+  }
+  return(new_power)
+}
+root2 &lt;- factory_root(2)
+root3 &lt;- factory_root(3)
+root4 &lt;- factory_root(4)
+```
+
+`factory_root` nos permite crear funciones para cualquier raíz
+
+---
+
+background-image: url("imagenes/fondo2.PNG")
+background-size: contain;
+background-position: 100% 0%
+
+# Fábricas de funciones
+
+¿Por qué no mejor crear simplemente una función que haga lo mismo?
+
+
+```r
+general_root &lt;- function(x, power) {x**(1/power)}
+```
+
+--
+
+Queremos una función que agregue "un print" a cualquier función
+
+--
+
+
+
+```r
+add_print &lt;- function(func) {
+  string_function &lt;-  rlang::as_string(rlang::ensym(func))
+* new_function &lt;- function(x) {
+*   result &lt;- func(x)
+*   print(paste0("El resultado de ", string_function,  ": ", result ))
+*   return(result)
+  }
+  return(new_function)
+}
+
+mean_print &lt;- add_print(mean)
+mean_print(c(1,2,3))
+```
+
+```
+## [1] "El resultado de mean: 2"
+```
+
+```
+## [1] 2
+```
+
+
+
+---
+
+background-image: url("imagenes/fondo2.PNG")
+background-size: contain;
+background-position: 100% 0%
+
+# Comentario al margen sobre funciones infix
 
 
 ---
@@ -1350,7 +1580,7 @@ df
 ```
 
 ```
-## # A tibble: 4 x 3
+## # A tibble: 4 × 3
 ##   calle            numero     depto    
 ##   &lt;chr&gt;            &lt;chr&gt;      &lt;list&gt;   
 ## 1 calle Hemingway  num 345    &lt;chr [1]&gt;
@@ -1431,6 +1661,19 @@ if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
     deleted = true;
   });
 })();
+// add `data-at-shortcutkeys` attribute to <body> to resolve conflicts with JAWS
+// screen reader (see PR #262)
+(function(d) {
+  let res = {};
+  d.querySelectorAll('.remark-help-content table tr').forEach(tr => {
+    const t = tr.querySelector('td:nth-child(2)').innerText;
+    tr.querySelectorAll('td:first-child .key').forEach(key => {
+      const k = key.innerText;
+      if (/^[a-z]$/.test(k)) res[k] = t;  // must be a single letter (key)
+    });
+  });
+  d.body.setAttribute('data-at-shortcutkeys', JSON.stringify(res));
+})(document);
 (function() {
   "use strict"
   // Replace <script> tags in slides area to make them executable

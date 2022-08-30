@@ -22,11 +22,9 @@ class: center, middle
 
 <img src="imagenes/logo_portada2.png" width="200" />
 
-## Capacitación en R intermedio
+## Capacitación en R y herramientas de productividad - nivel intermedio
 
-## dplyr y funciones
-
-## Proyecto Estratégico Servicios Compartidos para la Producción Estadística
+## Proyecto Estratégico Metodologías y Ciencia de Datos para la Producción Estadística
 
 ### Agosto 2022
 
@@ -304,16 +302,23 @@ background-position: 100% 0%
 
 # Ejercicio con rowwise
 
-Tenemos las siguientes fuentes de ingreso a nivel de persona: 
+Este ejercicio requiere la utilización de CASEN. Tenemos las siguientes fuentes de ingreso a nivel de persona: 
 
 - *y2803c* (jubilación)
 - *ytro* (ingresos ocasionales)
 - *y0101c* (ingreso trabajo dependiente)
 - *y0701c* (ingreso trabajo independiente)
 
-Queremos crear una columna que contenga es el mayor de estos valores a nivel de hogar. La idea es usar `rowwise`. 
+Queremos crear una columna que contenga el mayor de estos valores (variables de más arriba) a nivel de hogar. La idea es usar `rowwise`. 
 
---
+---
+
+background-image: url("imagenes/fondo2.PNG")
+background-size: contain;
+background-position: 100% 0%
+
+# Solución ejercicio con rowwise
+
 
 ```{r}
 casen2 <- casen %>%
@@ -323,8 +328,7 @@ casen2 <- casen %>%
   mutate(maximo = max(max)) %>% 
   ungroup()
 
-casen2 %>% 
-  select(folio, max, maximo, y2803c, ytro, y0101c, y0701c)
+casen2 %>% select(folio, max, maximo, y2803c, ytro, y0101c, y0701c)
 
 ```
 
@@ -458,11 +462,19 @@ background-position: 100% 0%
 
 # Ejercicio mutate-across
 
+Este ejercicio requiere los datos de CASEN. 
+
 Genere una variable que contenga la suma a nivel de hogar para las siguientes variables de CASEN: *ytotcor*, *yautcor*, *ytrabajocor*, *yotp*.
 
 Las nuevas variables deben tener el sufijo *_hog* 
 
---
+---
+background-image: url("imagenes/fondo2.PNG")
+background-size: contain;
+background-position: 100% 0%
+
+# Solución ejercicio mutate-across
+
 
 ```{r}
 
@@ -536,7 +548,8 @@ do_silly_stuff <- function(x) {
 }
 
 mtcars2 <- mtcars %>% 
-  mutate_at(vars(mpg, disp),  list(norm = do_silly_stuff) ) 
+  mutate(across(c("mpg", "disp"),
+              .fns = list(norm = ~do_silly_stuff(.))  ))
 
 ```
 
@@ -550,7 +563,10 @@ mtcars2 <- mtcars %>%
 
 ```{r}
 mtcars2 <- mtcars %>% 
-  mutate_at(vars(mpg, disp),  list(norm = ~do_silly_stuff(.) ) ) 
+  mutate(across(c("mpg", "disp"),
+              .fns = list(norm = do_silly_stuff  )))
+
+
 ```
 
 
@@ -933,7 +949,14 @@ Crea una función que reciba un vector numérico y devuelva en un vector o en un
 
 Puedes probar tu función con el siguiente vector `rnorm(10000)`
 
---
+---
+
+background-image: url("imagenes/fondo2.PNG")
+background-size: contain;
+background-position: 100% 0%
+
+# Solución ejercicio funciones
+
 
 ```{r}
 get_stats <- function(x) {
@@ -1040,7 +1063,6 @@ sum_something <- function(n, func) {
     total <- total + func(i)
   }
   return(total)
-  
 }
 
 ```
@@ -1162,7 +1184,7 @@ background-position: 100% 0%
 
 # Comentario al margen sobre funciones infix
 
-### En `R` los operadores suma, resta, multiplicación, etc son un tipo especial de función llamada *infix*
+### En `R` los operadores suma, resta, multiplicación, etc. son un tipo especial de función llamada *infix*
 
 ```{r, eval=F}
 3 + 2
@@ -1315,6 +1337,24 @@ background-position: 100% 0%
 
 # Tarea para la 🏠
 
+**Logística**
+
+Las tareas deberán ser entregadas a través de git. En el repositorio de gitlab de la clase anterior existe una rama llamada tareas, en la cual existe una carpeta para cada clase. Hagan *fetch* (o *pull*) de esa rama y empujen sus tareas a la carpeta correspondiente. La estructura del archivo debe ser la siguiente: nombre_apellido1_apellido2.R
+
+La url es la siguiente:
+
+https://gitlab.com/inesscc/demostracion_git.git
+
+
+---
+
+background-image: url("imagenes/fondo2.PNG")
+background-size: contain;
+background-position: 100% 0%
+
+# Tarea para la 🏠
+
+
 **Ejercicio 1**
 
 Construye una función llamada `get_cv` que calcule el coeficiente de variación de un vector. `get_cv` debe recibir 2 parámetros:
@@ -1339,7 +1379,7 @@ background-position: 100% 0%
 
 Crea una función llamada `build_address` que construya una dirección en base a algunos *inputs*, siguiendo un formato establecido. `build_address` recibe 2 parámetros obligatorios y uno opcional. 
 
-Parámetros obligatorios:
+Parámetros obligatorios:    
 
 - *street*: string que contiene el nombre de la calle
 - *number*: string que contiene el número de la dirección  
@@ -1375,6 +1415,8 @@ Considere que no existe un formato preestablecido para registrar calle y número
 
 En la construcción de `build_address` puede usar cualquier función que sea de utilidad para lograr el objetivo. No es necesario que la función sea capaz de procesar todos los casos posibles.
 
+**Pista: En la construcción de la función pueden ser útiles algunas expresiones regulares**
+
 ---
 
 background-image: url("imagenes/fondo2.PNG")
@@ -1402,8 +1444,6 @@ df
 
 
 
-
-
  
 
 
@@ -1416,10 +1456,8 @@ class: center, middle
 
 <img src="imagenes/logo_portada2.png" width="200" />
 
-## Capacitación en R intermedio
+## Capacitación en R y herramientas de productividad - nivel intermedio
 
-## dplyr y funciones
-
-## Proyecto Estratégico Servicios Compartidos para la Producción Estadística
+## Proyecto Estratégico Metodologías y Ciencia de Datos para la Producción Estadística
 
 ### Agosto 2022

@@ -26,7 +26,7 @@ class: center, middle
 
 ## Proyecto Estratégico Metodologías y Ciencia de Datos para la Producción Estadística
 
-### Agosto 2022
+### Diciembre 2022
 
 ```{r setup, include=FALSE}
 options(htmltools.dir.version = TRUE)
@@ -121,13 +121,20 @@ background-position: 100% 0%
 ### Podemos usar `rowwise` con algunos *helpers*
 
 ```{r, echo=F}
+
 casen <- read_feather("data/casen_2020_edit.feather")
 
+# library(haven)
+# library(feather)
+# casen <- read_dta("data/Casen_en_Pandemia_2020_STATA_revisada2022_09.dta")
+# 
 # casen <- casen %>%
-#   mutate_at(vars(y2803c, ytro, y0101c, y0701c ), ~if_else(is.na(.), 0, .))
-#  
+#   mutate_at(vars(y2803c, ytro, y0101c, y0701c ), ~if_else(is.na(.), 0, .)) %>%
+#   select(folio, y2803c, ytro, y0101c, y0701c, yautcorh, ytrabajocor, ymonecorh, yaimcorh, ytotcorh, yoprcor,
+#   "ytotcor", "yautcor", "ytrabajocor", "yotp")
+# 
 # write_feather(casen, "data/casen_2020_edit.feather")
-
+# 
 
 ```
 
@@ -136,13 +143,11 @@ casen <- read_feather("data/casen_2020_edit.feather")
 
 casen2 <- casen %>% 
   rowwise() %>% 
-  mutate(suma = sum(c_across(starts_with("yt"))))
-
+  mutate(suma = sum(c_across(starts_with("yta")))) # funciona extremadamente lento
 
 mtcars2 <- mtcars %>% 
   rowwise() %>% 
   mutate(suma = sum(c_across(where(is.numeric))))
-
 
 ```
 
@@ -238,7 +243,11 @@ df <- tribble(
 df2 <- df %>% 
   mutate(data = runif(n, min, max))
 df2
+
 ```
+
+### No funcionó  😞
+
 ---
 background-image: url("imagenes/fondo2.PNG")
 background-size: contain;
@@ -246,10 +255,10 @@ background-position: 100% 0%
 
 # Otro ejemplo (continuación)
 
-### Podemos usar rowwise 
+### Pero podemos usar rowwise 
+
 
 ```{r}
-
 df2 <- df %>% 
   rowwise() %>% 
   mutate(data = list(runif(n, min, max)))
@@ -931,12 +940,170 @@ sumar_xyz(1, 2)
 sumar_xyz(1, 2, 0.4)
 ```
 
+
+
 ---
 background-image: url("imagenes/fondo2.PNG")
 background-size: contain;
 background-position: 100% 0%
 
-# Ejercicio funciones
+# Ejercicio funciones 1
+
+Tenemos una tabla con características de los personajes de *Demon Slayer*. Crea una función llamada `get_imc` que calcule el IMC. Luego, usa tu función dentro de `mutate` para crear una columna llamada imc que contenga el IMC de cada uno de los personajes. 
+
+La fórmula del IMC es: $imc = \frac{kg}{m^2}$ 
+
+**Recuerda que la altura en el dataset está en centímetros**
+
+---
+background-image: url("imagenes/fondo2.PNG")
+background-size: contain;
+background-position: 100% 0%
+
+# Solución ejercicio funciones 1
+
+
+```{r}
+demon <- read_csv("data/demon_slayer.csv") %>% 
+  janitor::clean_names()
+
+get_imc <- function(weight, height) {
+  imc <- weight /(height / 100) **2
+  return(imc)
+}
+demon <- demon %>% 
+  mutate(imc = get_imc(weight = weight_kg, height = height_cm))
+
+
+```
+
+---
+
+background-image: url("imagenes/fondo2.PNG")
+background-size: contain;
+background-position: 100% 0%
+
+# Ejercicio funciones 1.2
+
+La tabla categorias_imc permite clasificar en tramos los puntajes de imc. 
+
+```{r}
+categorias <- read_csv("data/categorias_imc.csv")
+categorias
+```
+
+Por simplicidad, usaremos solo las categorías de peso corporal (bajo peso, peso normal, sobrepeso y obesidad). Crearemos una función llamada `get_label` que reciba un valor de imc y retorne una categoría.   
+
+
+```{r, echo=FALSE}
+get_label <- function(imc) {
+  if (imc <= 18.5) {
+    label <- "bajo peso"
+  } else if (imc <= 24.9) {
+    label <- "peso normal"
+  } else if (imc <= 29.9) {
+    label <- "sobrepeso"
+  } else if (imc > 29.9) {
+    label <- "obesidad"
+  }
+  return(label)
+}
+
+```
+
+
+```{r}
+get_label(23)
+```
+
+
+---
+
+background-image: url("imagenes/fondo2.PNG")
+background-size: contain;
+background-position: 100% 0%
+
+# Solución ejercicio funciones 1.2
+
+
+```{r}
+get_label <- function(imc) {
+  if (imc <= 18.5) {
+    label <- "bajo peso"
+  } else if (imc <= 24.9) {
+    label <- "peso normal"
+  } else if (imc <= 29.9) {
+    label <- "sobrepeso"
+  } else if (imc > 29.9) {
+    label <- "obesidad"
+  }
+  return(label)
+}
+```
+
+--
+
+### ¿Podríamos usar esto con mutate?
+
+--
+
+```{r, error=TRUE}
+demon <- demon %>% 
+  mutate(imc = get_imc(weight = weight_kg, height = height_cm)) %>% 
+  mutate(label = get_label(imc =  imc) ) #<<
+```
+
+
+---
+
+background-image: url("imagenes/fondo2.PNG")
+background-size: contain;
+background-position: 100% 0%
+
+# Solución ejercicio funciones 1.2
+
+### ¿Alguna idea? 
+
+--
+
+```{r}
+demon <- demon %>% 
+  mutate(imc = get_imc(weight = weight_kg, height = height_cm)) %>% 
+  rowwise() %>% #<<
+  mutate(label = get_label(imc =  imc) ) %>% 
+  ungroup()
+```
+
+--
+
+```{r}
+get_label <- function(imc) {
+  
+   generate_label <- function(imc) { #<<
+    if (imc <= 18.5) {
+      label <- "bajo peso"
+    } else if (imc <= 24.9) {
+      label <- "peso normal"
+    } else if (imc <= 29.9) {
+      label <- "sobrepeso"
+    } else if (imc > 29.9) {
+      label <- "obesidad"
+    }
+    return(label)    
+    }
+  return(map(imc, generate_label)) #<<
+}
+
+```
+
+
+
+---
+background-image: url("imagenes/fondo2.PNG")
+background-size: contain;
+background-position: 100% 0%
+
+# Ejercicio funciones 2
 
 Crea una función que reciba un vector numérico y devuelva en un vector o en una lista los siguientes valores:
 
@@ -955,7 +1122,7 @@ background-image: url("imagenes/fondo2.PNG")
 background-size: contain;
 background-position: 100% 0%
 
-# Solución ejercicio funciones
+# Solución ejercicio funciones 2
 
 
 ```{r}
@@ -966,6 +1133,7 @@ set.seed(123)
 get_stats(rnorm(n = 10000))
 
 ```
+
 
 
 ---
@@ -1343,7 +1511,7 @@ Las tareas deberán ser entregadas a través de git. En el repositorio de gitlab
 
 La url es la siguiente:
 
-https://gitlab.com/inesscc/demostracion_git.git
+https://gitlab.com/inesscc/demostracion_git_curso.git
 
 
 ---
@@ -1460,4 +1628,4 @@ class: center, middle
 
 ## Proyecto Estratégico Metodologías y Ciencia de Datos para la Producción Estadística
 
-### Agosto 2022
+### Diciembre 2022

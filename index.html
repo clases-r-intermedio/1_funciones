@@ -4,7 +4,8 @@
     <title>Capacitación paquete calidad</title>
     <meta charset="utf-8" />
     <meta name="author" content="" />
-    <meta name="date" content="2022-08-30" />
+    <meta name="date" content="2022-11-28" />
+    <script src="avanzado_files/header-attrs-2.17/header-attrs.js"></script>
     <link rel="stylesheet" href="xaringan-themer.css" type="text/css" />
   </head>
   <body>
@@ -22,7 +23,7 @@ class: center, middle
 
 ## Proyecto Estratégico Metodologías y Ciencia de Datos para la Producción Estadística
 
-### Agosto 2022
+### Diciembre 2022
 
 
 
@@ -120,8 +121,7 @@ background-position: 100% 0%
 ```r
 casen2 &lt;- casen %&gt;% 
   rowwise() %&gt;% 
-  mutate(suma = sum(c_across(starts_with("yt"))))
-
+  mutate(suma = sum(c_across(starts_with("yta")))) # funciona extremadamente lento
 
 mtcars2 &lt;- mtcars %&gt;% 
   rowwise() %&gt;% 
@@ -249,10 +249,13 @@ df2
 ## # A tibble: 3 × 4
 ##       n   min   max    data
 ##   &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;   &lt;dbl&gt;
-## 1     4     0     1   0.925
-## 2     2    10   100  76.2  
-## 3     3   100  1000 960.
+## 1     4     0     1   0.291
+## 2     2    10   100  65.1  
+## 3     3   100  1000 383.
 ```
+
+### No funcionó  😞
+
 ---
 background-image: url("imagenes/fondo2.PNG")
 background-size: contain;
@@ -260,7 +263,8 @@ background-position: 100% 0%
 
 # Otro ejemplo (continuación)
 
-### Podemos usar rowwise 
+### Pero podemos usar rowwise 
+
 
 
 ```r
@@ -273,7 +277,7 @@ df2$data[1]
 
 ```
 ## [[1]]
-## [1] 0.7661415 0.8458742 0.2601116 0.8080381
+## [1] 0.75855438 0.85115649 0.98928292 0.01297851
 ```
 
 --
@@ -301,7 +305,7 @@ toc()
 ```
 
 ```
-## 1.92 sec elapsed
+## 2.397 sec elapsed
 ```
 
 --
@@ -317,7 +321,7 @@ toc()
 ```
 
 ```
-## 0.06 sec elapsed
+## 0.247 sec elapsed
 ```
 --
 
@@ -362,18 +366,18 @@ casen2 %&gt;% select(folio, max, maximo, y2803c, ytro, y0101c, y0701c)
 
 ```
 ## # A tibble: 185,437 × 7
-##         folio     max  maximo y2803c  ytro  y0101c y0701c
-##         &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt;   &lt;dbl&gt;  &lt;dbl&gt;
-##  1 1101100101  150000  150000      0     0       0 150000
-##  2 1101100101       0  150000      0     0       0      0
-##  3 1101100102       0  372000      0     0       0      0
-##  4 1101100102  372000  372000      0     0  372000      0
-##  5 1101100102       0  372000      0     0       0      0
-##  6 1101100103 3000000 3000000      0     0 3000000      0
-##  7 1101100103       0 3000000      0     0       0      0
-##  8 1101100103       0 3000000      0     0       0      0
-##  9 1101100104       0       0      0     0       0      0
-## 10 1101100104       0       0      0     0       0      0
+##           folio     max  maximo y2803c  ytro  y0101c y0701c
+##           &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt;   &lt;dbl&gt;  &lt;dbl&gt;
+##  1 110110010101  150000  150000      0     0       0 150000
+##  2 110110010101       0  150000      0     0       0      0
+##  3 110110010201  372000  372000      0     0  372000      0
+##  4 110110010201       0  372000      0     0       0      0
+##  5 110110010201       0  372000      0     0       0      0
+##  6 110110010301       0 3000000      0     0       0      0
+##  7 110110010301 3000000 3000000      0     0 3000000      0
+##  8 110110010301       0 3000000      0     0       0      0
+##  9 110110010401       0       0      0     0       0      0
+## 10 110110010401       0       0      0     0       0      0
 ## # … with 185,427 more rows
 ```
 
@@ -557,12 +561,12 @@ casen2 %&gt;%
 
 ```
 ## # A tibble: 4 × 3
-##        folio ytotcor ytotcor_hog
-##        &lt;dbl&gt;   &lt;dbl&gt;       &lt;dbl&gt;
-## 1 1101100101  310833      390833
-## 2 1101100101   80000      390833
-## 3 1101100102   31000      947583
-## 4 1101100102  889500      947583
+##          folio ytotcor ytotcor_hog
+##          &lt;dbl&gt;   &lt;dbl&gt;       &lt;dbl&gt;
+## 1 110110010101  310833      390833
+## 2 110110010101   80000      390833
+## 3 110110010201  889500      947583
+## 4 110110010201   31000      947583
 ```
 
 
@@ -883,7 +887,7 @@ sumar_xy &lt;- function(x, y) {
 
 
 ```
-## Error in externa(): objeto 'x' no encontrado
+## Error in externa(): object 'x' not found
 ```
 .pull-left[
 &lt;img src="https://media.giphy.com/media/a5viI92PAF89q/giphy.gif" width="250" /&gt;
@@ -980,7 +984,7 @@ sumar_xyz(1, 2)
 ```
 
 ```
-## Error in sumar_xyz(1, 2): el argumento "z" está ausente, sin valor por omisión
+## Error in sumar_xyz(1, 2): argument "z" is missing, with no default
 ```
 
 ---
@@ -1043,12 +1047,185 @@ sumar_xyz(1, 2, 0.4)
 ## [1] 3.4
 ```
 
+
+
 ---
 background-image: url("imagenes/fondo2.PNG")
 background-size: contain;
 background-position: 100% 0%
 
-# Ejercicio funciones
+# Ejercicio funciones 1
+
+Tenemos una tabla con características de los personajes de *Demon Slayer*. Crea una función llamada `get_imc` que calcule el IMC. Luego, usa tu función dentro de `mutate` para crear una columna llamada imc que contenga el IMC de cada uno de los personajes. 
+
+La fórmula del IMC es: `\(imc = \frac{kg}{m^2}\)` 
+
+**Recuerda que la altura en el dataset está en centímetros**
+
+---
+background-image: url("imagenes/fondo2.PNG")
+background-size: contain;
+background-position: 100% 0%
+
+# Solución ejercicio funciones 1
+
+
+
+```r
+demon &lt;- read_csv("data/demon_slayer.csv") %&gt;% 
+  janitor::clean_names()
+
+get_imc &lt;- function(weight, height) {
+  imc &lt;- weight /(height / 100) **2
+  return(imc)
+}
+demon &lt;- demon %&gt;% 
+  mutate(imc = get_imc(weight = weight_kg, height = height_cm))
+```
+
+---
+
+background-image: url("imagenes/fondo2.PNG")
+background-size: contain;
+background-position: 100% 0%
+
+# Ejercicio funciones 1.2
+
+La tabla categorias_imc permite clasificar en tramos los puntajes de imc. 
+
+
+```r
+categorias &lt;- read_csv("data/categorias_imc.csv")
+categorias
+```
+
+```
+## # A tibble: 8 × 3
+##   Categoría         `IMC (kg/m²)` `Peso corporal`
+##   &lt;chr&gt;             &lt;chr&gt;         &lt;chr&gt;          
+## 1 Delgadez severa   &lt;16,0         Bajo peso      
+## 2 Delgadez moderada 16,0 - 17,0   Bajo peso      
+## 3 Delgadez leve     17,0 - 18,5   Bajo peso      
+## 4 Peso normal       18,5 - 24,9   Peso normal    
+## 5 Pre-obeso         25,0 - 29,9   Sobrepeso      
+## 6 Obesidad tipo I   30,0 - 34,9   Obesidad       
+## 7 Obesidad tipo II  35,0 - 39,9   Obesidad       
+## 8 Obesidad tipo III ≥ 40          Obesidad
+```
+
+Por simplicidad, usaremos solo las categorías de peso corporal (bajo peso, peso normal, sobrepeso y obesidad). Crearemos una función llamada `get_label` que reciba un valor de imc y retorne una categoría.   
+
+
+
+
+
+
+```r
+get_label(23)
+```
+
+```
+## [1] "peso normal"
+```
+
+
+---
+
+background-image: url("imagenes/fondo2.PNG")
+background-size: contain;
+background-position: 100% 0%
+
+# Solución ejercicio funciones 1.2
+
+
+
+```r
+get_label &lt;- function(imc) {
+  if (imc &lt;= 18.5) {
+    label &lt;- "bajo peso"
+  } else if (imc &lt;= 24.9) {
+    label &lt;- "peso normal"
+  } else if (imc &lt;= 29.9) {
+    label &lt;- "sobrepeso"
+  } else if (imc &gt; 29.9) {
+    label &lt;- "obesidad"
+  }
+  return(label)
+}
+```
+
+--
+
+### ¿Podríamos usar esto con mutate?
+
+--
+
+
+```r
+demon &lt;- demon %&gt;% 
+  mutate(imc = get_imc(weight = weight_kg, height = height_cm)) %&gt;% 
+* mutate(label = get_label(imc =  imc) )
+```
+
+```
+## Error in `mutate()`:
+## ! Problem while computing `label = get_label(imc = imc)`.
+## Caused by error in `if (imc &lt;= 18.5) ...`:
+## ! the condition has length &gt; 1
+```
+
+
+---
+
+background-image: url("imagenes/fondo2.PNG")
+background-size: contain;
+background-position: 100% 0%
+
+# Solución ejercicio funciones 1.2
+
+### ¿Alguna idea? 
+
+--
+
+
+```r
+demon &lt;- demon %&gt;% 
+  mutate(imc = get_imc(weight = weight_kg, height = height_cm)) %&gt;% 
+* rowwise() %&gt;%
+  mutate(label = get_label(imc =  imc) ) %&gt;% 
+  ungroup()
+```
+
+--
+
+
+```r
+get_label &lt;- function(imc) {
+  
+*  generate_label &lt;- function(imc) {
+    if (imc &lt;= 18.5) {
+      label &lt;- "bajo peso"
+    } else if (imc &lt;= 24.9) {
+      label &lt;- "peso normal"
+    } else if (imc &lt;= 29.9) {
+      label &lt;- "sobrepeso"
+    } else if (imc &gt; 29.9) {
+      label &lt;- "obesidad"
+    }
+    return(label)    
+    }
+* return(map(imc, generate_label))
+}
+```
+
+
+
+---
+background-image: url("imagenes/fondo2.PNG")
+background-size: contain;
+background-position: 100% 0%
+
+# Ejercicio funciones 2
 
 Crea una función que reciba un vector numérico y devuelva en un vector o en una lista los siguientes valores:
 
@@ -1067,7 +1244,7 @@ background-image: url("imagenes/fondo2.PNG")
 background-size: contain;
 background-position: 100% 0%
 
-# Solución ejercicio funciones
+# Solución ejercicio funciones 2
 
 
 
@@ -1083,6 +1260,7 @@ get_stats(rnorm(n = 10000))
 ##                                                               1%          99% 
 ## -0.002371702 -3.845320169  3.847767706 -0.011089219 -2.318682909  2.338747795
 ```
+
 
 
 ---
@@ -1485,7 +1663,7 @@ eval_tidy(expr("un" + "saludo"), env =  ambiente_esoterico  )
 ```
 
 ```
-## Error in "un" + "saludo": argumento no-numérico para operador binario
+## Error in "un" + "saludo": non-numeric argument to binary operator
 ```
 
 --
@@ -1520,7 +1698,7 @@ Las tareas deberán ser entregadas a través de git. En el repositorio de gitlab
 
 La url es la siguiente:
 
-https://gitlab.com/inesscc/demostracion_git.git
+https://gitlab.com/inesscc/demostracion_git_curso.git
 
 
 ---
@@ -1648,7 +1826,7 @@ class: center, middle
 
 ## Proyecto Estratégico Metodologías y Ciencia de Datos para la Producción Estadística
 
-### Agosto 2022
+### Diciembre 2022
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
 <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>

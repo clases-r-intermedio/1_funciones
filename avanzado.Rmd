@@ -26,7 +26,7 @@ class: center, middle
 
 ## Proyecto Estratégico Metodologías y Ciencia de Datos para la Producción Estadística
 
-### Diciembre 2022
+### Julio 2023
 
 ```{r setup, include=FALSE}
 options(htmltools.dir.version = TRUE)
@@ -1629,4 +1629,4 @@ class: center, middle
 
 ## Proyecto Estratégico Metodologías y Ciencia de Datos para la Producción Estadística
 
-### Diciembre 2022
+### Julio 2023

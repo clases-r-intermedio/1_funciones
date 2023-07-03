@@ -124,17 +124,17 @@ background-position: 100% 0%
 
 casen <- read_feather("data/casen_2020_edit.feather")
 
-# library(haven)
-# library(feather)
-# casen <- read_dta("data/Casen_en_Pandemia_2020_STATA_revisada2022_09.dta")
-# 
-# casen <- casen %>%
-#   mutate_at(vars(y2803c, ytro, y0101c, y0701c ), ~if_else(is.na(.), 0, .)) %>%
-#   select(folio, y2803c, ytro, y0101c, y0701c, yautcorh, ytrabajocor, ymonecorh, yaimcorh, ytotcorh, yoprcor,
-#   "ytotcor", "yautcor", "ytrabajocor", "yotp")
-# 
-# write_feather(casen, "data/casen_2020_edit.feather")
-# 
+library(haven)
+library(feather)
+casen <- read_dta("data/Casen_en_Pandemia_2020_STATA_revisada2022_09.dta")
+
+casen <- casen %>%
+  mutate_at(vars(y2803c, ytro, y0101c, y0701c ), ~if_else(is.na(.), 0, .)) %>%
+  select(folio, region, y2803c, ytro, y0101c, y0701c, yautcorh, ytrabajocor, ymonecorh, yaimcorh, ytotcorh, yoprcor,
+  "ytotcor", "yautcor", "ytrabajocor", "yotp")
+
+write_feather(casen, "data/casen_2020_edit.feather")
+
 
 ```
 
@@ -1099,42 +1099,43 @@ get_label <- function(imc) {
 
 
 ---
+
 background-image: url("imagenes/fondo2.PNG")
 background-size: contain;
 background-position: 100% 0%
 
 # Ejercicio funciones 2
 
-Crea una función que reciba un vector numérico y devuelva en un vector o en una lista los siguientes valores:
+Crea una función que reciba un vector numérico y devuelva la desviación estándar de dicho vector
 
-- media
-- mínimo
-- máximo
-- mediana
-- percentil 1
-- percentil 99
+$sd = \sqrt{\frac{1}{n-1}\sum_{i=1}^{n} (x_i - \bar{x})^2 }$
+
+La idea es no usar `sd`
 
 Puedes probar tu función con el siguiente vector `rnorm(10000)`
 
 ---
-
 background-image: url("imagenes/fondo2.PNG")
 background-size: contain;
 background-position: 100% 0%
 
 # Solución ejercicio funciones 2
 
-
 ```{r}
-get_stats <- function(x) {
-  return(c(mean(x), min(x), max(x), median(x), quantile(x, 0.01), quantile(x, 0.99)))
+get_sd <- function(x) {
+
+  cuadrados <- (x - mean(x))**2 # distancias respecto a la media
+  suma_cuadrados <- sum(cuadrados) # suma de cuadrados
+  n <- length(x) # n
+  sqrt(suma_cuadrados / (n - 1)) # salida
+
 }
+
 set.seed(123)
-get_stats(rnorm(n = 10000))
-
+vector <- rnorm(n = 10000)
+get_sd(vector)
+sd(vector)
 ```
-
-
 
 ---
 background-image: url("imagenes/fondo2.PNG")

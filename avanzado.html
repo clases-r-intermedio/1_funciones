@@ -4,8 +4,8 @@
     <title>Capacitación paquete calidad</title>
     <meta charset="utf-8" />
     <meta name="author" content="" />
-    <meta name="date" content="2022-11-28" />
-    <script src="avanzado_files/header-attrs-2.17/header-attrs.js"></script>
+    <meta name="date" content="2023-07-03" />
+    <script src="avanzado_files/header-attrs-2.21/header-attrs.js"></script>
     <link rel="stylesheet" href="xaringan-themer.css" type="text/css" />
   </head>
   <body>
@@ -249,9 +249,9 @@ df2
 ## # A tibble: 3 × 4
 ##       n   min   max    data
 ##   &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;   &lt;dbl&gt;
-## 1     4     0     1   0.291
-## 2     2    10   100  65.1  
-## 3     3   100  1000 383.
+## 1     4     0     1   0.632
+## 2     2    10   100  95.0  
+## 3     3   100  1000 692.
 ```
 
 ### No funcionó  😞
@@ -277,7 +277,7 @@ df2$data[1]
 
 ```
 ## [[1]]
-## [1] 0.75855438 0.85115649 0.98928292 0.01297851
+## [1] 0.48915749 0.12063249 0.02688323 0.90825775
 ```
 
 --
@@ -305,7 +305,7 @@ toc()
 ```
 
 ```
-## 2.397 sec elapsed
+## 1.238 sec elapsed
 ```
 
 --
@@ -321,7 +321,7 @@ toc()
 ```
 
 ```
-## 0.247 sec elapsed
+## 0.069 sec elapsed
 ```
 --
 
@@ -378,7 +378,7 @@ casen2 %&gt;% select(folio, max, maximo, y2803c, ytro, y0101c, y0701c)
 ##  8 110110010301       0 3000000      0     0       0      0
 ##  9 110110010401       0       0      0     0       0      0
 ## 10 110110010401       0       0      0     0       0      0
-## # … with 185,427 more rows
+## # ℹ 185,427 more rows
 ```
 
 
@@ -1007,7 +1007,7 @@ print(sumar_xyz(1, 2))
 ```
 
 ```
-## Error in py_call_impl(callable, dots$args, dots$keywords): TypeError: sumar_xyz() missing 1 required positional argument: 'z'
+## Error: TypeError: sumar_xyz() missing 1 required positional argument: 'z'
 ```
 
 ### `python` utiliza *call by value* (CBV)
@@ -1169,7 +1169,7 @@ demon &lt;- demon %&gt;%
 
 ```
 ## Error in `mutate()`:
-## ! Problem while computing `label = get_label(imc = imc)`.
+## ℹ In argument: `label = get_label(imc = imc)`.
 ## Caused by error in `if (imc &lt;= 18.5) ...`:
 ## ! the condition has length &gt; 1
 ```
@@ -1221,25 +1221,22 @@ get_label &lt;- function(imc) {
 
 
 ---
+
 background-image: url("imagenes/fondo2.PNG")
 background-size: contain;
 background-position: 100% 0%
 
 # Ejercicio funciones 2
 
-Crea una función que reciba un vector numérico y devuelva en un vector o en una lista los siguientes valores:
+Crea una función que reciba un vector numérico y devuelva la desviación estándar de dicho vector:
 
-- media
-- mínimo
-- máximo
-- mediana
-- percentil 1
-- percentil 99
+`\(sd = \sqrt{\frac{1}{n-1}\sum_{i=1}^{n} (x_i - \bar{x})^2 }\)`
+
+La idea es no usar `sd`
 
 Puedes probar tu función con el siguiente vector `rnorm(10000)`
 
 ---
-
 background-image: url("imagenes/fondo2.PNG")
 background-size: contain;
 background-position: 100% 0%
@@ -1247,21 +1244,32 @@ background-position: 100% 0%
 # Solución ejercicio funciones 2
 
 
+```r
+get_sd &lt;- function(x) {
+
+  cuadrados &lt;- (x - mean(x))**2 # distancias respecto a la media
+  suma_cuadrados &lt;- sum(cuadrados) # suma de cuadrados
+  n &lt;- length(x) # n
+  sqrt(suma_cuadrados / (n - 1)) # salida
+
+}
+
+set.seed(123)
+vector &lt;- rnorm(n = 10000)
+get_sd(vector)
+```
+
+```
+## [1] 0.9986366
+```
 
 ```r
-get_stats &lt;- function(x) {
-  return(c(mean(x), min(x), max(x), median(x), quantile(x, 0.01), quantile(x, 0.99)))
-}
-set.seed(123)
-get_stats(rnorm(n = 10000))
+sd(vector)
 ```
 
 ```
-##                                                               1%          99% 
-## -0.002371702 -3.845320169  3.847767706 -0.011089219 -2.318682909  2.338747795
+## [1] 0.9986366
 ```
-
-
 
 ---
 background-image: url("imagenes/fondo2.PNG")

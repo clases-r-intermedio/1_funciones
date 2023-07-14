@@ -1508,11 +1508,8 @@ background-position: 100% 0%
 
 **Logística**
 
-Las tareas deberán ser entregadas a través de git. En el repositorio de gitlab de la clase anterior existe una rama llamada tareas, en la cual existe una carpeta para cada clase. Hagan *fetch* (o *pull*) de esa rama y empujen sus tareas a la carpeta correspondiente. La estructura del archivo debe ser la siguiente: nombre_apellido1_apellido2.R
+Las tareas deberán ser entregadas a través de git. En el repositorio de github de la clase anterior existe una rama llamada tareas, en la cual existe una carpeta para cada clase. Hagan *fetch* (o *pull*) de esa rama y empujen sus tareas a la carpeta correspondiente. La estructura del archivo debe ser la siguiente: nombre_apellido1_apellido2.R
 
-La url es la siguiente:
-
-https://gitlab.com/inesscc/demostracion_git_curso.git
 
 
 ---

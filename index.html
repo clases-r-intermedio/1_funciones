@@ -5,7 +5,7 @@
     <meta charset="utf-8" />
     <meta name="author" content="" />
     <meta name="date" content="2023-07-31" />
-    <script src="avanzado_files/header-attrs-2.23/header-attrs.js"></script>
+    <script src="avanzado_files/header-attrs-2.22/header-attrs.js"></script>
     <script src="avanzado_files/clipboard-2.0.6/clipboard.min.js"></script>
     <link href="avanzado_files/xaringanExtra-clipboard-0.2.6/xaringanExtra-clipboard.css" rel="stylesheet" />
     <script src="avanzado_files/xaringanExtra-clipboard-0.2.6/xaringanExtra-clipboard.js"></script>
@@ -87,7 +87,7 @@ mtcars %&gt;%
 ```
 
 ```
-## # A tibble: 3 × 2
+## # A tibble: 3 x 2
 ##    gear media
 ##   &lt;dbl&gt; &lt;dbl&gt;
 ## 1     3 176. 
@@ -160,7 +160,7 @@ df %&gt;%
 ```
 
 ```
-## # A tibble: 3 × 2
+## # A tibble: 3 x 2
 ##   x         largo
 ##   &lt;list&gt;    &lt;int&gt;
 ## 1 &lt;dbl [1]&gt;     3
@@ -207,7 +207,7 @@ df %&gt;%
 ```
 
 ```
-## # A tibble: 3 × 2
+## # A tibble: 3 x 2
 ## # Rowwise: 
 ##   x         largo
 ##   &lt;list&gt;    &lt;int&gt;
@@ -250,12 +250,12 @@ df2
 ```
 
 ```
-## # A tibble: 3 × 4
+## # A tibble: 3 x 4
 ##       n   min   max    data
 ##   &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;   &lt;dbl&gt;
-## 1     4     0     1   0.781
-## 2     2    10   100  91.4  
-## 3     3   100  1000 349.
+## 1     4     0     1   0.564
+## 2     2    10   100  54.7  
+## 3     3   100  1000 192.
 ```
 
 ### No funcionó  😞
@@ -281,7 +281,7 @@ df2$data[1]
 
 ```
 ## [[1]]
-## [1] 0.9315518 0.6182115 0.2043509 0.9232840
+## [1] 0.56354396 0.46205521 0.03832088 0.57546209
 ```
 
 --
@@ -308,10 +308,6 @@ casen2 &lt;- casen %&gt;%
 toc()
 ```
 
-```
-## 1.224 sec elapsed
-```
-
 --
 
 ### Si la eficiencia es algo importante, es recomendable usar funciones como `rowSums` o `rowMeans`
@@ -322,10 +318,6 @@ tic()
 casen2 &lt;- casen %&gt;% 
   mutate(sum = rowSums(select(., yautcorh, ytrabajocor, ymonecorh, yaimcorh, ytotcorh, yoprcor))) 
 toc()
-```
-
-```
-## 0.067 sec elapsed
 ```
 --
 
@@ -369,20 +361,20 @@ casen2 %&gt;% select(folio, max, maximo, y2803c, ytro, y0101c, y0701c)
 ```
 
 ```
-## # A tibble: 185,437 × 7
-##           folio     max  maximo y2803c  ytro  y0101c y0701c
-##           &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt;   &lt;dbl&gt;  &lt;dbl&gt;
-##  1 110110010101  150000  150000      0     0       0 150000
-##  2 110110010101       0  150000      0     0       0      0
-##  3 110110010201  372000  372000      0     0  372000      0
-##  4 110110010201       0  372000      0     0       0      0
-##  5 110110010201       0  372000      0     0       0      0
-##  6 110110010301       0 3000000      0     0       0      0
-##  7 110110010301 3000000 3000000      0     0 3000000      0
-##  8 110110010301       0 3000000      0     0       0      0
-##  9 110110010401       0       0      0     0       0      0
-## 10 110110010401       0       0      0     0       0      0
-## # ℹ 185,427 more rows
+## # A tibble: 202,231 x 7
+##        folio    max maximo y2803c  ytro y0101c y0701c
+##        &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;
+##  1 100090101      0 411242      0     0      0      0
+##  2 100090101      0 411242      0     0      0      0
+##  3 100090101 411242 411242      0     0 411242      0
+##  4 100090201      0      0      0     0      0      0
+##  5 100090201      0      0      0     0      0      0
+##  6 100090201      0      0      0     0      0      0
+##  7 100090201      0      0      0     0      0      0
+##  8 100090301      0      0      0     0      0      0
+##  9 100090301      0      0      0     0      0      0
+## 10 100090301      0      0      0     0      0      0
+## # i 202,221 more rows
 ```
 
 
@@ -420,9 +412,8 @@ for (var in names(mtcars)) {
 
 
 ```
-##                     mpg cyl      disp
-## Mazda RX4     0.4510638 0.5 0.2217511
-## Mazda RX4 Wag 0.4510638 0.5 0.2217511
+##                  mpg cyl      disp
+## Volvo 142E 0.4680851   0 0.1244699
 ```
 
 --
@@ -432,15 +423,16 @@ for (var in names(mtcars)) {
 
 ```r
 mtcars2 &lt;- mtcars %&gt;% 
-  mutate_all(~ (. - min(.)) / (max(.) - min(.)) ) 
+  mutate(across(.fns = ~ (. - min(.)) / (max(.) - min(.)) ) )
 ```
 
 
 ```
-##                     mpg cyl      disp
-## Mazda RX4     0.4510638 0.5 0.2217511
-## Mazda RX4 Wag 0.4510638 0.5 0.2217511
+##                  mpg cyl      disp
+## Volvo 142E 0.4680851   0 0.1244699
 ```
+
+**Nota:** Esto se solía hacer con `mutate_all` 👀
 ---
 background-image: url("imagenes/fondo2.PNG")
 background-size: contain;
@@ -453,7 +445,7 @@ background-position: 100% 0%
 
 ```r
 mtcars2 &lt;- mtcars %&gt;% 
-  mutate_at(vars(mpg, disp), ~ (. - min(.)) / (max(.) - min(.)) )
+  mutate(across(c(mpg, disp), ~ (. - min(.)) / (max(.) - min(.)) ))
 ```
 
 --
@@ -464,7 +456,7 @@ mtcars2 &lt;- mtcars %&gt;%
 
 ```r
 mtcars2 &lt;- mtcars %&gt;% 
-  mutate_at(vars(mpg, disp),  list(norm = ~(. - min(.)) / (max(.) - min(.)) ))
+  mutate(across(c(mpg, disp), list(norm = ~ (. - min(.)) / (max(.) - min(.)) )))
 ```
 
 
@@ -478,6 +470,7 @@ names(mtcars2)
 ## [13] "disp_norm"
 ```
 
+**Nota:** Esto se solía hacer con `mutate_at` 👀
 
 ---
 
@@ -488,33 +481,21 @@ background-position: 100% 0%
 # Solo para algunas variables
 
 
-### La sintaxis de mutate_at es muy clara, pero está quedando obsoleta 👀
-
---
-
-
-```r
-mtcars2 &lt;- mtcars %&gt;% 
-  mutate(across(c("mpg", "disp") , .fns =  list(norm = ~(. - min(.)) / (max(.) - min(.)) )))
-```
-
---
-
 ### Podemos adecuar los nombres a nuestro gusto
 
 
 ```r
 mtcars2 &lt;- mtcars %&gt;% 
   mutate(across(c("mpg", "disp") , .fns =  list(norm = ~(. - min(.)) / (max(.) - min(.)) ),
-                .names = "{.col}_{.fn}"))
+                .names = "{.fn}_{.col}"))
 
 names(mtcars2)
 ```
 
 ```
 ##  [1] "mpg"       "cyl"       "disp"      "hp"        "drat"      "wt"       
-##  [7] "qsec"      "vs"        "am"        "gear"      "carb"      "mpg_norm" 
-## [13] "disp_norm"
+##  [7] "qsec"      "vs"        "am"        "gear"      "carb"      "norm_mpg" 
+## [13] "norm_disp"
 ```
 
 --
@@ -525,8 +506,10 @@ names(mtcars2)
 
 ```r
 mtcars2 &lt;- mtcars %&gt;% 
-  mutate_if(is.numeric,  list(norm =  ~(. - min(.)) / (max(.) - min(.)) ))
+  mutate(across(is.numeric,  list(norm =  ~(. - min(.)) / (max(.) - min(.)) )))
 ```
+
+**Nota:** Esto se solía hacer con `mutate_if` 👀
 
 ---
 background-image: url("imagenes/fondo2.PNG")
@@ -564,13 +547,13 @@ casen2 %&gt;%
 ```
 
 ```
-## # A tibble: 4 × 3
-##          folio ytotcor ytotcor_hog
-##          &lt;dbl&gt;   &lt;dbl&gt;       &lt;dbl&gt;
-## 1 110110010101  310833      390833
-## 2 110110010101   80000      390833
-## 3 110110010201  889500      947583
-## 4 110110010201   31000      947583
+## # A tibble: 4 x 3
+##       folio ytotcor ytotcor_hog
+##       &lt;dbl&gt;   &lt;dbl&gt;       &lt;dbl&gt;
+## 1 100090101  220826      860894
+## 2 100090101  228826      860894
+## 3 100090101  411242      860894
+## 4 100090201       0      268192
 ```
 
 
@@ -604,9 +587,9 @@ background-position: 100% 0%
 
 ```r
 mtcars2 &lt;- mtcars %&gt;% 
-  mutate_at(vars(mpg, disp),  list(norm = ~(. - min(.)) / (max(.) - min(.)) )) %&gt;% 
-  mutate_at(vars(mpg_norm, disp_norm),  ~(. + mean(.))) %&gt;% 
-  mutate_at(vars(mpg_norm, disp_norm),  ~(. / median(.)))
+  mutate(across(c(mpg, disp),  list(norm = ~(. - min(.)) / (max(.) - min(.)) ))) %&gt;% 
+  mutate(across(c(mpg_norm, disp_norm), ~(. + mean(.)))) %&gt;% 
+  mutate(across(c(mpg_norm, disp_norm),  ~(. / median(.))))
 ```
 
 
@@ -730,16 +713,11 @@ wrapper &lt;- function() {
   return(environment(sumar_xy))  
 }
 
-wrapper
+wrapper()
 ```
 
 ```
-## function() {
-##   sumar_xy &lt;- function(x, y) {
-##     x + y
-##   }
-##   return(environment(sumar_xy))  
-## }
+## &lt;environment: 0x0000000014e0d9e0&gt;
 ```
 ### Vemos que el ambiente ya no es R_GlobalEnv 🤓
 
@@ -891,7 +869,7 @@ sumar_xy &lt;- function(x, y) {
 
 
 ```
-## Error in externa(): object 'x' not found
+## Error in externa(): objeto 'x' no encontrado
 ```
 .pull-left[
 &lt;img src="https://media.giphy.com/media/a5viI92PAF89q/giphy.gif" width="250" /&gt;
@@ -988,7 +966,7 @@ sumar_xyz(1, 2)
 ```
 
 ```
-## Error in sumar_xyz(1, 2): argument "z" is missing, with no default
+## Error in sumar_xyz(1, 2): el argumento "z" está ausente, sin valor por omisión
 ```
 
 ---
@@ -1104,7 +1082,7 @@ categorias
 ```
 
 ```
-## # A tibble: 8 × 3
+## # A tibble: 8 x 3
 ##   Categoría         `IMC (kg/m²)` `Peso corporal`
 ##   &lt;chr&gt;             &lt;chr&gt;         &lt;chr&gt;          
 ## 1 Delgadez severa   &lt;16,0         Bajo peso      
@@ -1114,7 +1092,7 @@ categorias
 ## 5 Pre-obeso         25,0 - 29,9   Sobrepeso      
 ## 6 Obesidad tipo I   30,0 - 34,9   Obesidad       
 ## 7 Obesidad tipo II  35,0 - 39,9   Obesidad       
-## 8 Obesidad tipo III ≥ 40          Obesidad
+## 8 Obesidad tipo III = 40          Obesidad
 ```
 
 Por simplicidad, usaremos solo las categorías de peso corporal (bajo peso, peso normal, sobrepeso y obesidad). Crearemos una función llamada `get_label` que reciba un valor de imc y retorne una categoría.   
@@ -1169,13 +1147,6 @@ get_label &lt;- function(imc) {
 demon &lt;- demon %&gt;% 
   mutate(imc = get_imc(weight = weight_kg, height = height_cm)) %&gt;% 
 * mutate(label = get_label(imc =  imc) )
-```
-
-```
-## Error in `mutate()`:
-## ℹ In argument: `label = get_label(imc = imc)`.
-## Caused by error in `if (imc &lt;= 18.5) ...`:
-## ! the condition has length &gt; 1
 ```
 
 
@@ -1675,7 +1646,7 @@ eval_tidy(expr("un" + "saludo"), env =  ambiente_esoterico  )
 ```
 
 ```
-## Error in "un" + "saludo": non-numeric argument to binary operator
+## Error in "un" + "saludo": argumento no-numérico para operador binario
 ```
 
 --
@@ -1807,7 +1778,7 @@ df
 ```
 
 ```
-## # A tibble: 4 × 3
+## # A tibble: 4 x 3
 ##   calle            numero     depto    
 ##   &lt;chr&gt;            &lt;chr&gt;      &lt;list&gt;   
 ## 1 calle Hemingway  num 345    &lt;chr [1]&gt;

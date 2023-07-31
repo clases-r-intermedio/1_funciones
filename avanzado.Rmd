@@ -121,20 +121,19 @@ background-position: 100% 0%
 
 ### Podemos usar `rowwise` con algunos *helpers*
 
-```{r, echo=F}
+```{r, echo=F, eval=T}
 
-casen <- read_feather("data/casen_2020_edit.feather")
 
 library(haven)
 library(feather)
-casen <- read_dta("data/Casen_en_Pandemia_2020_STATA_revisada2022_09.dta")
+casen <- read_dta("data/casen.dta")
 
 casen <- casen %>%
   mutate_at(vars(y2803c, ytro, y0101c, y0701c ), ~if_else(is.na(.), 0, .)) %>%
   select(folio, region, y2803c, ytro, y0101c, y0701c, yautcorh, ytrabajocor, ymonecorh, yaimcorh, ytotcorh, yoprcor,
   "ytotcor", "yautcor", "ytrabajocor", "yotp")
 
-write_feather(casen, "data/casen_2020_edit.feather")
+#write_feather(casen, "data/casen_2020_edit.feather")
 
 
 ```
@@ -282,7 +281,7 @@ background-position: 100% 0%
 
 ### Para tablas con muchas filas, puede volverse un poco lento
 
-```{r, echo=T}
+```{r, echo=T, eval=FALSE}
 tic()
 casen2 <- casen %>% 
   rowwise() %>% 
@@ -294,7 +293,7 @@ toc()
 
 ### Si la eficiencia es algo importante, es recomendable usar funciones como `rowSums` o `rowMeans`
 
-```{r, echo = T}
+```{r, echo = T, eval = F}
 tic()
 casen2 <- casen %>% 
   mutate(sum = rowSums(select(., yautcorh, ytrabajocor, ymonecorh, yaimcorh, ytotcorh, yoprcor))) 
@@ -375,7 +374,7 @@ for (var in names(mtcars)) {
 
 
 ```{r, echo=FALSE}
-mtcars2 %>% select(mpg, cyl, disp) %>% slice(1:2)
+mtcars2 %>% select(mpg, cyl, disp) %>% slice_tail(n = 1)
 ```
 
 --
@@ -384,12 +383,14 @@ mtcars2 %>% select(mpg, cyl, disp) %>% slice(1:2)
 
 ```{r}
 mtcars2 <- mtcars %>% 
-  mutate_all(~ (. - min(.)) / (max(.) - min(.)) ) 
+  mutate(across(.fns = ~ (. - min(.)) / (max(.) - min(.)) ) )
 ```
 
 ```{r, echo=FALSE}
-mtcars2 %>% select(mpg, cyl, disp) %>% slice(1:2)
+mtcars2 %>% select(mpg, cyl, disp) %>% slice_tail(n = 1)
 ```
+
+**Nota:** Esto se solía hacer con `mutate_all` 👀
 ---
 background-image: url("imagenes/fondo2.PNG")
 background-size: contain;
@@ -401,7 +402,7 @@ background-position: 100% 0%
 
 ```{r}
 mtcars2 <- mtcars %>% 
-  mutate_at(vars(mpg, disp), ~ (. - min(.)) / (max(.) - min(.)) )
+  mutate(across(c(mpg, disp), ~ (. - min(.)) / (max(.) - min(.)) ))
 
 ```
 
@@ -412,7 +413,7 @@ mtcars2 <- mtcars %>%
 
 ```{r}
 mtcars2 <- mtcars %>% 
-  mutate_at(vars(mpg, disp),  list(norm = ~(. - min(.)) / (max(.) - min(.)) ))
+  mutate(across(c(mpg, disp), list(norm = ~ (. - min(.)) / (max(.) - min(.)) )))
 
 ```
 
@@ -420,6 +421,7 @@ mtcars2 <- mtcars %>%
 names(mtcars2)
 ```
 
+**Nota:** Esto se solía hacer con `mutate_at` 👀
 
 ---
 
@@ -430,26 +432,12 @@ background-position: 100% 0%
 # Solo para algunas variables
 
 
-### La sintaxis de mutate_at es muy clara, pero está quedando obsoleta 👀
-
---
-
-```{r}
-
-mtcars2 <- mtcars %>% 
-  mutate(across(c("mpg", "disp") , .fns =  list(norm = ~(. - min(.)) / (max(.) - min(.)) )))
-
-
-```
-
---
-
 ### Podemos adecuar los nombres a nuestro gusto
 
 ```{r}
 mtcars2 <- mtcars %>% 
   mutate(across(c("mpg", "disp") , .fns =  list(norm = ~(. - min(.)) / (max(.) - min(.)) ),
-                .names = "{.col}_{.fn}"))
+                .names = "{.fn}_{.col}"))
 
 names(mtcars2)
 ```
@@ -461,9 +449,11 @@ names(mtcars2)
 
 ```{r}
 mtcars2 <- mtcars %>% 
-  mutate_if(is.numeric,  list(norm =  ~(. - min(.)) / (max(.) - min(.)) ))
+  mutate(across(is.numeric,  list(norm =  ~(. - min(.)) / (max(.) - min(.)) )))
 
 ```
+
+**Nota:** Esto se solía hacer con `mutate_if` 👀
 
 ---
 background-image: url("imagenes/fondo2.PNG")
@@ -531,9 +521,9 @@ background-position: 100% 0%
 
 ```{r}
 mtcars2 <- mtcars %>% 
-  mutate_at(vars(mpg, disp),  list(norm = ~(. - min(.)) / (max(.) - min(.)) )) %>% 
-  mutate_at(vars(mpg_norm, disp_norm),  ~(. + mean(.))) %>% 
-  mutate_at(vars(mpg_norm, disp_norm),  ~(. / median(.)))
+  mutate(across(c(mpg, disp),  list(norm = ~(. - min(.)) / (max(.) - min(.)) ))) %>% 
+  mutate(across(c(mpg_norm, disp_norm), ~(. + mean(.)))) %>% 
+  mutate(across(c(mpg_norm, disp_norm),  ~(. / median(.))))
 
 ```
 
@@ -639,7 +629,7 @@ wrapper <- function() {
   return(environment(sumar_xy))  
 }
 
-wrapper
+wrapper()
 
 ```
 ### Vemos que el ambiente ya no es R_GlobalEnv 🤓

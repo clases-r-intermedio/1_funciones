@@ -4,8 +4,12 @@
     <title>Capacitación paquete calidad</title>
     <meta charset="utf-8" />
     <meta name="author" content="" />
-    <meta name="date" content="2023-07-17" />
-    <script src="avanzado_files/header-attrs-2.21/header-attrs.js"></script>
+    <meta name="date" content="2023-07-31" />
+    <script src="avanzado_files/header-attrs-2.23/header-attrs.js"></script>
+    <script src="avanzado_files/clipboard-2.0.6/clipboard.min.js"></script>
+    <link href="avanzado_files/xaringanExtra-clipboard-0.2.6/xaringanExtra-clipboard.css" rel="stylesheet" />
+    <script src="avanzado_files/xaringanExtra-clipboard-0.2.6/xaringanExtra-clipboard.js"></script>
+    <script>window.xaringanExtraClipboard(null, {"button":"Copy Code","success":"Copied!","error":"Press Ctrl+C to Copy"})</script>
     <link rel="stylesheet" href="xaringan-themer.css" type="text/css" />
   </head>
   <body>
@@ -249,9 +253,9 @@ df2
 ## # A tibble: 3 × 4
 ##       n   min   max    data
 ##   &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;   &lt;dbl&gt;
-## 1     4     0     1   0.557
-## 2     2    10   100  58.3  
-## 3     3   100  1000 167.
+## 1     4     0     1   0.781
+## 2     2    10   100  91.4  
+## 3     3   100  1000 349.
 ```
 
 ### No funcionó  😞
@@ -277,7 +281,7 @@ df2$data[1]
 
 ```
 ## [[1]]
-## [1] 0.52303781 0.03042316 0.80908268 0.29596880
+## [1] 0.9315518 0.6182115 0.2043509 0.9232840
 ```
 
 --
@@ -305,7 +309,7 @@ toc()
 ```
 
 ```
-## 1.297 sec elapsed
+## 1.224 sec elapsed
 ```
 
 --
@@ -321,7 +325,7 @@ toc()
 ```
 
 ```
-## 0.069 sec elapsed
+## 0.067 sec elapsed
 ```
 --
 
@@ -1007,7 +1011,7 @@ print(sumar_xyz(1, 2))
 ```
 
 ```
-## Error: TypeError: sumar_xyz() missing 1 required positional argument: 'z'
+## sumar_xyz() missing 1 required positional argument: 'z'
 ```
 
 ### `python` utiliza *call by value* (CBV)

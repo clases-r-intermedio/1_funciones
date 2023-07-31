@@ -1082,7 +1082,7 @@ get_label <- function(imc) {
     }
     return(label)    
     }
-  return(map(imc, generate_label)) #<<
+  return(map_chr(imc, generate_label)) #<<
 }
 
 ```

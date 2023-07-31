@@ -253,9 +253,9 @@ df2
 ## # A tibble: 3 x 4
 ##       n   min   max    data
 ##   &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;   &lt;dbl&gt;
-## 1     4     0     1   0.564
-## 2     2    10   100  54.7  
-## 3     3   100  1000 192.
+## 1     4     0     1   0.996
+## 2     2    10   100  32.2  
+## 3     3   100  1000 832.
 ```
 
 ### No funcionó  😞
@@ -281,7 +281,7 @@ df2$data[1]
 
 ```
 ## [[1]]
-## [1] 0.56354396 0.46205521 0.03832088 0.57546209
+## [1] 0.3199172 0.6741349 0.4299121 0.9403284
 ```
 
 --
@@ -717,7 +717,7 @@ wrapper()
 ```
 
 ```
-## &lt;environment: 0x0000000014e0d9e0&gt;
+## &lt;environment: 0x0000000014e2db28&gt;
 ```
 ### Vemos que el ambiente ya no es R_GlobalEnv 🤓
 
@@ -1189,7 +1189,7 @@ get_label &lt;- function(imc) {
     }
     return(label)    
     }
-* return(map(imc, generate_label))
+* return(map_chr(imc, generate_label))
 }
 ```
 

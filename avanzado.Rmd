@@ -121,7 +121,7 @@ background-position: 100% 0%
 
 ### Podemos usar `rowwise` con algunos *helpers*
 
-```{r, echo=F, eval=T}
+```{r, echo=F, eval=F}
 
 
 library(haven)
@@ -137,6 +137,13 @@ casen <- casen %>%
 
 
 ```
+
+
+```{r, echo = F}
+casen <- read_feather("data/casen_2020_edit.feather")
+
+```
+
 
 
 ```{r, echo=T, eval=F}
@@ -281,7 +288,7 @@ background-position: 100% 0%
 
 ### Para tablas con muchas filas, puede volverse un poco lento
 
-```{r, echo=T, eval=FALSE}
+```{r, echo=T, eval=TRUE}
 tic()
 casen2 <- casen %>% 
   rowwise() %>% 
@@ -293,7 +300,7 @@ toc()
 
 ### Si la eficiencia es algo importante, es recomendable usar funciones como `rowSums` o `rowMeans`
 
-```{r, echo = T, eval = F}
+```{r, echo = T, eval = TRUE}
 tic()
 casen2 <- casen %>% 
   mutate(sum = rowSums(select(., yautcorh, ytrabajocor, ymonecorh, yaimcorh, ytotcorh, yoprcor))) 
@@ -1489,19 +1496,6 @@ background-position: 100% 0%
 
 
 ### Es importante asimilar los contenidos de esta clase sobre funciones
-
----
-background-image: url("imagenes/fondo2.PNG")
-background-size: contain;
-background-position: 100% 0%
-
-# Tarea para la 🏠
-
-**Logística**
-
-Las tareas deberán ser entregadas a través de git. En el repositorio de github de la clase anterior existe una rama llamada tareas, en la cual existe una carpeta para cada clase. Hagan *fetch* (o *pull*) de esa rama y empujen sus tareas a la carpeta correspondiente. La estructura del archivo debe ser la siguiente: nombre_apellido1_apellido2.R
-
-
 
 ---
 

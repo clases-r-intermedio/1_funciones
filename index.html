@@ -3,9 +3,8 @@
   <head>
     <title>Capacitación paquete calidad</title>
     <meta charset="utf-8" />
-    <meta name="author" content="" />
-    <meta name="date" content="2023-07-31" />
-    <script src="avanzado_files/header-attrs-2.22/header-attrs.js"></script>
+    <meta name="date" content="2024-11-19" />
+    <script src="avanzado_files/header-attrs-2.27/header-attrs.js"></script>
     <script src="avanzado_files/clipboard-2.0.6/clipboard.min.js"></script>
     <link href="avanzado_files/xaringanExtra-clipboard-0.2.6/xaringanExtra-clipboard.css" rel="stylesheet" />
     <script src="avanzado_files/xaringanExtra-clipboard-0.2.6/xaringanExtra-clipboard.js"></script>
@@ -80,14 +79,14 @@ background-position: 100% 0%
 ### En `dplyr` estamos acostumbrados a operar de manera vectorizada (verticalmente)
 
 
-```r
+``` r
 mtcars %&gt;% 
   group_by(gear) %&gt;% 
   summarise(media = mean(hp))
 ```
 
 ```
-## # A tibble: 3 x 2
+## # A tibble: 3 × 2
 ##    gear media
 ##   &lt;dbl&gt; &lt;dbl&gt;
 ## 1     3 176. 
@@ -100,7 +99,7 @@ mtcars %&gt;%
 
 
 
-```r
+``` r
 mtcars2 &lt;- mtcars %&gt;% 
   rowwise() %&gt;% 
   mutate(suma = sum(cyl, disp, hp,drat)) %&gt;% 
@@ -122,7 +121,11 @@ background-position: 100% 0%
 
 
 
-```r
+
+
+
+
+``` r
 casen2 &lt;- casen %&gt;% 
   rowwise() %&gt;% 
   mutate(suma = sum(c_across(starts_with("yta")))) # funciona extremadamente lento
@@ -142,7 +145,7 @@ background-position: 100% 0%
 ### Tenemos un dataframe que contiene vectores
 
 
-```r
+``` r
 df &lt;- tibble(
   x = list(1, 2:3, 4:6)
 )
@@ -154,13 +157,13 @@ df &lt;- tibble(
 --
 
 
-```r
+``` r
 df %&gt;% 
   mutate(largo = length(x))
 ```
 
 ```
-## # A tibble: 3 x 2
+## # A tibble: 3 × 2
 ##   x         largo
 ##   &lt;list&gt;    &lt;int&gt;
 ## 1 &lt;dbl [1]&gt;     3
@@ -188,7 +191,7 @@ background-position: 100% 0%
 --
 
 
-```r
+``` r
 df %&gt;% 
   mutate(largo = map_int(x, length))
 
@@ -200,14 +203,14 @@ df %&gt;%
 ### Es deseable no salir del *framework* de `dplyr`
 
 
-```r
+``` r
 df %&gt;% 
   rowwise() %&gt;% 
   mutate(largo = length(x))
 ```
 
 ```
-## # A tibble: 3 x 2
+## # A tibble: 3 × 2
 ## # Rowwise: 
 ##   x         largo
 ##   &lt;list&gt;    &lt;int&gt;
@@ -231,7 +234,7 @@ background-position: 100% 0%
 ### Queremos simular conjuntos de datos a partir de los siguientes parámetros
 
 
-```r
+``` r
 df &lt;- tribble(
   ~ n, ~ min, ~ max,
     4,     0,     1,
@@ -243,19 +246,19 @@ df &lt;- tribble(
 --
 
 
-```r
+``` r
 df2 &lt;- df %&gt;% 
   mutate(data = runif(n, min, max))
 df2
 ```
 
 ```
-## # A tibble: 3 x 4
-##       n   min   max    data
-##   &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;   &lt;dbl&gt;
-## 1     4     0     1   0.996
-## 2     2    10   100  32.2  
-## 3     3   100  1000 832.
+## # A tibble: 3 × 4
+##       n   min   max     data
+##   &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;    &lt;dbl&gt;
+## 1     4     0     1   0.0752
+## 2     2    10   100  27.5   
+## 3     3   100  1000 605.
 ```
 
 ### No funcionó  😞
@@ -271,7 +274,7 @@ background-position: 100% 0%
 
 
 
-```r
+``` r
 df2 &lt;- df %&gt;% 
   rowwise() %&gt;% 
   mutate(data = list(runif(n, min, max)))
@@ -281,7 +284,7 @@ df2$data[1]
 
 ```
 ## [[1]]
-## [1] 0.3199172 0.6741349 0.4299121 0.9403284
+## [1] 0.2102071 0.6588732 0.1742258 0.4066744
 ```
 
 --
@@ -300,7 +303,7 @@ background-position: 100% 0%
 ### Para tablas con muchas filas, puede volverse un poco lento
 
 
-```r
+``` r
 tic()
 casen2 &lt;- casen %&gt;% 
   rowwise() %&gt;% 
@@ -308,16 +311,24 @@ casen2 &lt;- casen %&gt;%
 toc()
 ```
 
+```
+## 1.47 sec elapsed
+```
+
 --
 
 ### Si la eficiencia es algo importante, es recomendable usar funciones como `rowSums` o `rowMeans`
 
 
-```r
+``` r
 tic()
 casen2 &lt;- casen %&gt;% 
   mutate(sum = rowSums(select(., yautcorh, ytrabajocor, ymonecorh, yaimcorh, ytotcorh, yoprcor))) 
 toc()
+```
+
+```
+## 0.068 sec elapsed
 ```
 --
 
@@ -349,7 +360,7 @@ background-position: 100% 0%
 
 
 
-```r
+``` r
 casen2 &lt;- casen %&gt;%
   rowwise() %&gt;% 
   mutate(max = max(y2803c, ytro, y0101c, y0701c, na.rm = T)) %&gt;% 
@@ -361,20 +372,20 @@ casen2 %&gt;% select(folio, max, maximo, y2803c, ytro, y0101c, y0701c)
 ```
 
 ```
-## # A tibble: 202,231 x 7
-##        folio    max maximo y2803c  ytro y0101c y0701c
-##        &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;
-##  1 100090101      0 411242      0     0      0      0
-##  2 100090101      0 411242      0     0      0      0
-##  3 100090101 411242 411242      0     0 411242      0
-##  4 100090201      0      0      0     0      0      0
-##  5 100090201      0      0      0     0      0      0
-##  6 100090201      0      0      0     0      0      0
-##  7 100090201      0      0      0     0      0      0
-##  8 100090301      0      0      0     0      0      0
-##  9 100090301      0      0      0     0      0      0
-## 10 100090301      0      0      0     0      0      0
-## # i 202,221 more rows
+## # A tibble: 185,437 × 7
+##           folio     max  maximo y2803c  ytro  y0101c y0701c
+##           &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt;   &lt;dbl&gt;  &lt;dbl&gt;
+##  1 110110010101  150000  150000      0     0       0 150000
+##  2 110110010101       0  150000      0     0       0      0
+##  3 110110010201  372000  372000      0     0  372000      0
+##  4 110110010201       0  372000      0     0       0      0
+##  5 110110010201       0  372000      0     0       0      0
+##  6 110110010301       0 3000000      0     0       0      0
+##  7 110110010301 3000000 3000000      0     0 3000000      0
+##  8 110110010301       0 3000000      0     0       0      0
+##  9 110110010401       0       0      0     0       0      0
+## 10 110110010401       0       0      0     0       0      0
+## # ℹ 185,427 more rows
 ```
 
 
@@ -402,7 +413,7 @@ $$ norm = \frac{x - min(x)}{max(x) - min(x)}    $$
 
 
 
-```r
+``` r
 mtcars2 &lt;- mtcars
 for (var in names(mtcars)) {
   mtcars2[[var]] &lt;- (mtcars[[var]] - min(mtcars[[var]])) / (max(mtcars[[var]]) - min(mtcars[[var]]))
@@ -421,7 +432,7 @@ for (var in names(mtcars)) {
 ### Estilo `dplyr`
 
 
-```r
+``` r
 mtcars2 &lt;- mtcars %&gt;% 
   mutate(across(.fns = ~ (. - min(.)) / (max(.) - min(.)) ) )
 ```
@@ -443,7 +454,7 @@ background-position: 100% 0%
 ### Solo me interesa `mpg` y `disp`
 
 
-```r
+``` r
 mtcars2 &lt;- mtcars %&gt;% 
   mutate(across(c(mpg, disp), ~ (. - min(.)) / (max(.) - min(.)) ))
 ```
@@ -454,13 +465,13 @@ mtcars2 &lt;- mtcars %&gt;%
 
 
 
-```r
+``` r
 mtcars2 &lt;- mtcars %&gt;% 
   mutate(across(c(mpg, disp), list(norm = ~ (. - min(.)) / (max(.) - min(.)) )))
 ```
 
 
-```r
+``` r
 names(mtcars2)
 ```
 
@@ -484,7 +495,7 @@ background-position: 100% 0%
 ### Podemos adecuar los nombres a nuestro gusto
 
 
-```r
+``` r
 mtcars2 &lt;- mtcars %&gt;% 
   mutate(across(c("mpg", "disp") , .fns =  list(norm = ~(. - min(.)) / (max(.) - min(.)) ),
                 .names = "{.fn}_{.col}"))
@@ -504,7 +515,7 @@ names(mtcars2)
 
 
 
-```r
+``` r
 mtcars2 &lt;- mtcars %&gt;% 
   mutate(across(is.numeric,  list(norm =  ~(. - min(.)) / (max(.) - min(.)) )))
 ```
@@ -533,7 +544,7 @@ background-position: 100% 0%
 
 
 
-```r
+``` r
 casen2 &lt;- casen %&gt;% 
   group_by(folio) %&gt;% 
   mutate(across(c("ytotcor", "yautcor", "ytrabajocor", "yotp"),
@@ -547,13 +558,13 @@ casen2 %&gt;%
 ```
 
 ```
-## # A tibble: 4 x 3
-##       folio ytotcor ytotcor_hog
-##       &lt;dbl&gt;   &lt;dbl&gt;       &lt;dbl&gt;
-## 1 100090101  220826      860894
-## 2 100090101  228826      860894
-## 3 100090101  411242      860894
-## 4 100090201       0      268192
+## # A tibble: 4 × 3
+##          folio ytotcor ytotcor_hog
+##          &lt;dbl&gt;   &lt;dbl&gt;       &lt;dbl&gt;
+## 1 110110010101  310833      390833
+## 2 110110010101   80000      390833
+## 3 110110010201  889500      947583
+## 4 110110010201   31000      947583
 ```
 
 
@@ -585,7 +596,7 @@ background-position: 100% 0%
 ### Opción "carretera" 
 
 
-```r
+``` r
 mtcars2 &lt;- mtcars %&gt;% 
   mutate(across(c(mpg, disp),  list(norm = ~(. - min(.)) / (max(.) - min(.)) ))) %&gt;% 
   mutate(across(c(mpg_norm, disp_norm), ~(. + mean(.)))) %&gt;% 
@@ -601,10 +612,10 @@ background-position: 100% 0%
 
 # Operaciones complejas 
 
-### Podemos construir una función y luego usarla dentro de `mutate_at`
+### Podemos construir una función y luego usarla dentro de `mutate`
 
 
-```r
+``` r
 do_silly_stuff &lt;- function(x) {
   normalizar &lt;-  (x - min(x)) / (max(x) - min(x))
   norm_media &lt;-  normalizar + mean(normalizar)
@@ -626,7 +637,7 @@ mtcars2 &lt;- mtcars %&gt;%
 ### Alternativamente
 
 
-```r
+``` r
 mtcars2 &lt;- mtcars %&gt;% 
   mutate(across(c("mpg", "disp"),
               .fns = list(norm = do_silly_stuff  )))
@@ -657,14 +668,14 @@ Las funciones tienen 3 componentes:
 
 
 
-```r
+``` r
 sumar_xy &lt;- function(x, y) {
   x + y
 }
 ```
 
 
-```r
+``` r
 body(sumar_xy)
 ```
 
@@ -682,7 +693,7 @@ background-position: 100% 0%
 # Repaso de funciones
 
 
-```r
+``` r
 formals(sumar_xy)
 ```
 
@@ -695,7 +706,7 @@ formals(sumar_xy)
 --
 
 
-```r
+``` r
 environment(sumar_xy)
 ```
 
@@ -705,7 +716,7 @@ environment(sumar_xy)
 --
 
 
-```r
+``` r
 wrapper &lt;- function() {
   sumar_xy &lt;- function(x, y) {
     x + y
@@ -717,7 +728,7 @@ wrapper()
 ```
 
 ```
-## &lt;environment: 0x0000000014e2db28&gt;
+## &lt;environment: 0x559ec9a30430&gt;
 ```
 ### Vemos que el ambiente ya no es R_GlobalEnv 🤓
 
@@ -734,7 +745,7 @@ background-position: 100% 0%
 
 
 
-```r
+``` r
 z &lt;- 3
 crear_z &lt;- function() {
   z &lt;- 100
@@ -748,7 +759,7 @@ crear_z()
 ## [1] 100
 ```
 
-```r
+``` r
 print(z)
 ```
 
@@ -773,7 +784,7 @@ background-position: 100% 0%
 ### Las funciones buscan variables "hacia arriba"
 
 
-```r
+``` r
 sumar_xy &lt;- function(x, y) {
   x + y + z
 }
@@ -789,7 +800,7 @@ sumar_xy(1, 2)
 ### ¿Qué devuelve la función sumar_xy?
 
 
-```r
+``` r
 z &lt;- 1
 sumar_xy &lt;- function(x, y) {
   z &lt;- 100
@@ -819,7 +830,7 @@ background-position: 100% 0%
 
 
 
-```r
+``` r
 z &lt;- 1
 sumar_xy &lt;- function(x, y) {
   z &lt;- 100
@@ -854,7 +865,7 @@ background-position: 100% 0%
 ### ¿Qué devuelve `sumar_xy`?
 
 
-```r
+``` r
 z &lt;- 1
 externa &lt;- function(){
   c(x + y + z)
@@ -869,7 +880,7 @@ sumar_xy &lt;- function(x, y) {
 
 
 ```
-## Error in externa(): objeto 'x' no encontrado
+## Error in externa(): object 'x' not found
 ```
 .pull-left[
 &lt;img src="https://media.giphy.com/media/a5viI92PAF89q/giphy.gif" width="250" /&gt;
@@ -900,7 +911,7 @@ background-position: 100% 0%
 
 
 
-```r
+``` r
 z &lt;- 1
 externa &lt;- function(x, y){
     c(x + y + z)
@@ -943,7 +954,7 @@ background-position: 100% 0%
 
 
 
-```r
+``` r
 sumar_xyz &lt;- function(x, y, z) {
   x + y
 }
@@ -958,7 +969,7 @@ sumar_xyz(1, 2)
 ### La variable `z` no se evalúa hasta que realmente se necesita 
 
 
-```r
+``` r
 sumar_xyz &lt;- function(x, y, z) {
   x + y + z
 }
@@ -966,7 +977,7 @@ sumar_xyz(1, 2)
 ```
 
 ```
-## Error in sumar_xyz(1, 2): el argumento "z" está ausente, sin valor por omisión
+## Error in sumar_xyz(1, 2): argument "z" is missing, with no default
 ```
 
 ---
@@ -982,14 +993,14 @@ background-position: 100% 0%
 
 
 
-```python
+``` python
 def sumar_xyz(x, y, z):
   return(x + y)
 print(sumar_xyz(1, 2))
 ```
 
 ```
-## sumar_xyz() missing 1 required positional argument: 'z'
+## TypeError: sumar_xyz() missing 1 required positional argument: 'z'
 ```
 
 ### `python` utiliza *call by value* (CBV)
@@ -1006,7 +1017,7 @@ background-position: 100% 0%
 ### En algunos casos vale la pena incluir argumentos por defecto
 
 
-```r
+``` r
 sumar_xyz &lt;- function(x, y, z = 5) {
   x + y + z
 }
@@ -1021,7 +1032,7 @@ sumar_xyz(1, 2)
 ### Si explicitamos un valor para *z*, la función se evalúa en dicho valor
 
 
-```r
+``` r
 sumar_xyz(1, 2, 0.4)
 ```
 
@@ -1053,7 +1064,7 @@ background-position: 100% 0%
 
 
 
-```r
+``` r
 demon &lt;- read_csv("data/demon_slayer.csv") %&gt;% 
   janitor::clean_names()
 
@@ -1076,13 +1087,13 @@ background-position: 100% 0%
 La tabla categorias_imc permite clasificar en tramos los puntajes de imc. 
 
 
-```r
+``` r
 categorias &lt;- read_csv("data/categorias_imc.csv")
 categorias
 ```
 
 ```
-## # A tibble: 8 x 3
+## # A tibble: 8 × 3
 ##   Categoría         `IMC (kg/m²)` `Peso corporal`
 ##   &lt;chr&gt;             &lt;chr&gt;         &lt;chr&gt;          
 ## 1 Delgadez severa   &lt;16,0         Bajo peso      
@@ -1092,7 +1103,7 @@ categorias
 ## 5 Pre-obeso         25,0 - 29,9   Sobrepeso      
 ## 6 Obesidad tipo I   30,0 - 34,9   Obesidad       
 ## 7 Obesidad tipo II  35,0 - 39,9   Obesidad       
-## 8 Obesidad tipo III = 40          Obesidad
+## 8 Obesidad tipo III ≥ 40          Obesidad
 ```
 
 Por simplicidad, usaremos solo las categorías de peso corporal (bajo peso, peso normal, sobrepeso y obesidad). Crearemos una función llamada `get_label` que reciba un valor de imc y retorne una categoría.   
@@ -1102,7 +1113,7 @@ Por simplicidad, usaremos solo las categorías de peso corporal (bajo peso, peso
 
 
 
-```r
+``` r
 get_label(23)
 ```
 
@@ -1121,7 +1132,7 @@ background-position: 100% 0%
 
 
 
-```r
+``` r
 get_label &lt;- function(imc) {
   if (imc &lt;= 18.5) {
     label &lt;- "bajo peso"
@@ -1143,7 +1154,7 @@ get_label &lt;- function(imc) {
 --
 
 
-```r
+``` r
 demon &lt;- demon %&gt;% 
   mutate(imc = get_imc(weight = weight_kg, height = height_cm)) %&gt;% 
 * mutate(label = get_label(imc =  imc) )
@@ -1163,7 +1174,7 @@ background-position: 100% 0%
 --
 
 
-```r
+``` r
 demon &lt;- demon %&gt;% 
   mutate(imc = get_imc(weight = weight_kg, height = height_cm)) %&gt;% 
 * rowwise() %&gt;%
@@ -1174,7 +1185,7 @@ demon &lt;- demon %&gt;%
 --
 
 
-```r
+``` r
 get_label &lt;- function(imc) {
   
 *  generate_label &lt;- function(imc) {
@@ -1219,7 +1230,7 @@ background-position: 100% 0%
 # Solución ejercicio funciones 2
 
 
-```r
+``` r
 get_sd &lt;- function(x) {
 
   cuadrados &lt;- (x - mean(x))**2 # distancias respecto a la media
@@ -1238,7 +1249,7 @@ get_sd(vector)
 ## [1] 0.9986366
 ```
 
-```r
+``` r
 sd(vector)
 ```
 
@@ -1258,7 +1269,7 @@ Son funciones que reciben como argumento una función
 --
 
 
-```r
+``` r
 vectorized_function &lt;- function(x, func) {
   new_x &lt;-  do_silly_stuff(x)
   out &lt;-  func(new_x)
@@ -1280,7 +1291,7 @@ Se utilizan para hacer abstracciones
 Sumemos números enteros
 
 
-```r
+``` r
 sum_integers &lt;- function(n) {
   total &lt;- 0
   for (i in 1:n) {
@@ -1301,7 +1312,7 @@ background-position: 100% 0%
 Función para sumar log10
 
 
-```r
+``` r
 sum_log10 &lt;- function(n) {
   total &lt;- 0
   for (i in 1:n) {
@@ -1317,7 +1328,7 @@ sum_log10 &lt;- function(n) {
 Función para sumar cuadrados
 
 
-```r
+``` r
 sum_power &lt;- function(n) {
   total &lt;- 0
   for (i in 1:n) {
@@ -1341,7 +1352,7 @@ background-position: 100% 0%
 Función genérica para sumar cosas  
 
 
-```r
+``` r
 sum_something &lt;- function(n, func) {
   total &lt;- 0
   for (i in 1:n) {
@@ -1357,7 +1368,7 @@ sum_something &lt;- function(n, func) {
 Ahora creamos las funciones básicas
 
 
-```r
+``` r
 power2 &lt;- function(x) {x**2}
 
 identity &lt;- function(x) {x}
@@ -1368,7 +1379,7 @@ identity &lt;- function(x) {x}
 Utilizamos la abstracción
 
 
-```r
+``` r
 sum_something(10, log10)
 ```
 
@@ -1376,7 +1387,7 @@ sum_something(10, log10)
 ## [1] 6.559763
 ```
 
-```r
+``` r
 sum_something(10, power2)
 ```
 
@@ -1408,7 +1419,7 @@ Existe `sqrt` para el caso particular de raíz cuadrada
 --
 
 
-```r
+``` r
 factory_root &lt;- function(power_input) {
   new_power &lt;- function(x) {
     x**(1/power_input)    
@@ -1433,7 +1444,7 @@ background-position: 100% 0%
 ¿Por qué no mejor crear simplemente una función que haga lo mismo?
 
 
-```r
+``` r
 general_root &lt;- function(x, power) {x**(1/power)}
 ```
 
@@ -1445,7 +1456,7 @@ Queremos una función que agregue "un print" a cualquier función
 
 
 
-```r
+``` r
 add_print &lt;- function(func) {
   string_function &lt;-  rlang::as_string(rlang::ensym(func))
 * new_function &lt;- function(x) {
@@ -1490,7 +1501,7 @@ background-position: 100% 0%
 ### En `R` los operadores suma, resta, multiplicación, etc. son un tipo especial de función llamada *infix*
 
 
-```r
+``` r
 3 + 2
 3 * 2
 ```
@@ -1500,7 +1511,7 @@ background-position: 100% 0%
 ### Las podemos escribir en su forma *prefix* 
 
 
-```r
+``` r
 `+`(3, 2)
 ```
 
@@ -1508,7 +1519,7 @@ background-position: 100% 0%
 ## [1] 5
 ```
 
-```r
+``` r
 `*`(3, 2)
 ```
 
@@ -1529,7 +1540,7 @@ background-position: 100% 0%
 ### En algunos lenguajes de programación, como python, estos operadores tienen características muy útiles
 
 
-```python
+``` python
 "perro" + " gato"
 ```
 
@@ -1538,7 +1549,7 @@ background-position: 100% 0%
 ```
 
 
-```python
+``` python
 3 * " perro"
 ```
 
@@ -1563,7 +1574,7 @@ background-position: 100% 0%
 --
 
 
-```r
+``` r
 `+` &lt;- function(x, y) {
   paste(x , y)
 }
@@ -1587,7 +1598,7 @@ background-position: 100% 0%
 
 
 
-```r
+``` r
 3 + 2
 ```
 
@@ -1622,7 +1633,7 @@ background-position: 100% 0%
 --
 
 
-```r
+``` r
 ambiente_esoterico &lt;- env()
 
 ambiente_esoterico$`+` &lt;- function(x, y) {
@@ -1641,12 +1652,12 @@ eval_tidy(expr("un" + "saludo"), env =  ambiente_esoterico  )
 ### Fuera de nuestro ambiente, el operador sigue funcionando normalmente
 
 
-```r
+``` r
 "un" + "saludo"
 ```
 
 ```
-## Error in "un" + "saludo": argumento no-numérico para operador binario
+## Error in "un" + "saludo": non-numeric argument to binary operator
 ```
 
 --
@@ -1667,19 +1678,6 @@ background-position: 100% 0%
 
 
 ### Es importante asimilar los contenidos de esta clase sobre funciones
-
----
-background-image: url("imagenes/fondo2.PNG")
-background-size: contain;
-background-position: 100% 0%
-
-# Tarea para la 🏠
-
-**Logística**
-
-Las tareas deberán ser entregadas a través de git. En el repositorio de github de la clase anterior existe una rama llamada tareas, en la cual existe una carpeta para cada clase. Hagan *fetch* (o *pull*) de esa rama y empujen sus tareas a la carpeta correspondiente. La estructura del archivo debe ser la siguiente: nombre_apellido1_apellido2.R
-
-
 
 ---
 
@@ -1724,7 +1722,7 @@ El parámetro opcional es *apartment* y contiene el número del departamento.
 A continuación se muestra un ejemplo del resultado esperado
 
 
-```r
+``` r
 street &lt;- "calle Los Alerces"
 number &lt;- "número 123"
 build_address(street, number)
@@ -1767,7 +1765,7 @@ Utilice la función creada sobre el siguiente `dataframe`, generando una nueva c
 
 
 
-```r
+``` r
 df &lt;- tribble(~calle,              ~numero,      ~depto,
               "calle Hemingway",   "num 345",    "depto. 345",
               "av. Albert Camus",  "número 123", "123",
@@ -1778,7 +1776,7 @@ df
 ```
 
 ```
-## # A tibble: 4 x 3
+## # A tibble: 4 × 3
 ##   calle            numero     depto    
 ##   &lt;chr&gt;            &lt;chr&gt;      &lt;list&gt;   
 ## 1 calle Hemingway  num 345    &lt;chr [1]&gt;
